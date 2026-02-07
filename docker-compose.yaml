@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  convcourse-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: convcourse-frontend-dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+      - ./messages:/app/messages
+      - ./next.config.js:/app/next.config.js
+      - ./tsconfig.json:/app/tsconfig.json
+      - ./tailwind.config.ts:/app/tailwind.config.ts
+      - ./postcss.config.cjs:/app/postcss.config.cjs
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - WATCHPACK_POLLING=true
+      # Assumes backend is running on host or another container in the same network
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+    command: npm run dev
+    stdin_open: true
+    tty: true
+
+networks:
+  default:
+    external: true
+    name: convcourse-network
+

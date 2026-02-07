@@ -1,0 +1,1262 @@
+{
+    "metadata": {
+        "home": {
+            "title": "Certified - Automatic Validations with AI",
+            "titleTemplate": "%s | Certified",
+            "description": "AI that compares course guides, credits, and typology. Traceable decision with blockchain anchoring. ≥80% similarity with ±10% justified margin."
+        },
+        "terminos": {
+            "title": "Terms of Service",
+            "description": "Terms and conditions of use for the Certified platform for automatic academic validations."
+        },
+        "privacidad": {
+            "title": "Privacy Policy",
+            "description": "Privacy policy and data protection of Certified. GDPR compliance and academic data processing."
+        },
+        "planes": {
+            "title": "Plans and Pricing",
+            "description": "Flexible plans for universities of all sizes. From educational startups to large institutions. Free trial available."
+        }
+    },
+    "layout": {
+        "skipToContent": "Skip to main content",
+        "skipToNav": "Go to navigation"
+    },
+    "address": {
+        "street": "123 Technology Street",
+        "city": "28001 Madrid, Spain"
+    },
+    "CookieBanner": {
+        "message": "We use cookies to improve your experience on our website and analyze traffic. By clicking \"Accept\", you accept our use of cookies according to our",
+        "privacyLink": "Privacy Policy",
+        "reject": "Reject",
+        "accept": "Accept",
+        "close": "Close cookie banner"
+    },
+    "LanguageSwitcher": {
+        "changeLanguage": "Change language",
+        "changeLanguageTo": "Change language to {language}"
+    },
+    "TrustIndicators": {
+        "title": "Verifiable Trust and Compliance",
+        "subtitle": "Backed by the most prestigious institutions and international security and regulatory compliance certifications.",
+        "certifications": {
+            "gdpr": {
+                "title": "GDPR Compliant",
+                "description": "Full compliance with European data regulation",
+                "badge": "Certified"
+            },
+            "eidas": {
+                "title": "eIDAS Framework",
+                "description": "European digital identity for official documents",
+                "badge": "Validated"
+            },
+            "iso": {
+                "title": "ISO 27001",
+                "description": "Information security management",
+                "badge": "In progress"
+            },
+            "bologna": {
+                "title": "Bologna Process",
+                "description": "European higher education standards",
+                "badge": "Aligned"
+            }
+        },
+        "partners": {
+            "title": "Institutional Partners",
+            "items": {
+                "upm": {
+                    "name": "Polytechnic University of Madrid",
+                    "role": "Pilot Partner",
+                    "description": "Technical system validation"
+                },
+                "crue": {
+                    "name": "CRUE Spanish Universities",
+                    "role": "Strategic Advisor",
+                    "description": "Standards and best practices"
+                },
+                "enqa": {
+                    "name": "ENQA",
+                    "role": "European Validator",
+                    "description": "Quality certification"
+                },
+                "naric": {
+                    "name": "ENIC-NARIC Spain",
+                    "role": "Recognition Authority",
+                    "description": "Official degree validation"
+                }
+            }
+        },
+        "security": {
+            "title": "Enterprise-Grade Security",
+            "subtitle": "We implement industry best practices to protect the most sensitive academic data.",
+            "features": [
+                "End-to-end encryption of all data",
+                "Distributed storage with redundancy",
+                "Automatic security audits",
+                "Role-based access control (RBAC)",
+                "Immutable logs on blockchain",
+                "Automatic backup and disaster recovery"
+            ]
+        },
+        "transparency": {
+            "title": "Total Transparency",
+            "traceability": {
+                "value": "100%",
+                "label": "Traceability",
+                "description": "Every decision recorded"
+            },
+            "monitoring": {
+                "value": "24/7",
+                "label": "Monitoring",
+                "description": "Automatic alerts"
+            },
+            "availability": {
+                "value": "99.9%",
+                "label": "Availability",
+                "description": "Guaranteed SLA"
+            }
+        }
+    },
+    "ExplainabilityExamples": {
+        "origin": [
+            "Linear equation systems and matrices",
+            "Vector spaces and linear transformations",
+            "Eigenvalues and eigenvectors"
+        ],
+        "destination": [
+            "Solving linear systems using matrices",
+            "Theory of real vector spaces",
+            "Diagonalization and eigenvalues"
+        ],
+        "validations": {
+            "ects": "ECTS",
+            "type": "Type",
+            "grade": "Grade"
+        }
+    },
+    "Header": {
+        "nav": {
+            "solution": "Solution",
+            "useCases": "Use Cases",
+            "contact": "Contact",
+            "demo": "Interactive Demo"
+        },
+        "login": "Client Login"
+    },
+    "Footer": {
+        "description": "The standard platform for intelligent university degree validation.",
+        "quickLinks": "Quick Links",
+        "legal": "Legal",
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Service",
+        "cookies": "Cookie Policy",
+        "contact": "Contact",
+        "rights": "All rights reserved."
+    },
+    "Hero": {
+        "badge": "New Technology 2025",
+        "title": "University Validations",
+        "highlight": "Intelligent & Secure",
+        "description": "The first platform using contrasted AI to automate academic transcript analysis with 99% accuracy.",
+        "cta": "Request Demo",
+        "secondaryCta": "View Use Cases",
+        "stats": {
+            "universities": "Universities",
+            "validations": "Validations",
+            "accuracy": "AI Accuracy"
+        }
+    },
+    "Features": {
+        "title": "Key Features",
+        "subtitle": "Technology designed for academic excellence",
+        "ai": {
+            "title": "Contrasted AI",
+            "desc": "Deep semantic analysis of study plans."
+        },
+        "speed": {
+            "title": "Speed",
+            "desc": "Transcript processing in seconds."
+        },
+        "security": {
+            "title": "Security",
+            "desc": "Blockchain certification of each verdict."
+        }
+    },
+    "Demo": {
+        "title": "Interactive Demo",
+        "upload": {
+            "title": "Upload Documents",
+            "dragDrop": "Drag your documents here",
+            "zones": {
+                "origin": "Origin Syllabus",
+                "destination": "Destination Syllabus",
+                "grades": "Transcript of Records"
+            }
+        },
+        "loading": {
+            "processing": "Processing with AI...",
+            "analyzing": "Analyzing documents...",
+            "comparing": "Comparing study plans...",
+            "messages": [
+                "Analyzing documents with AI...",
+                "Extracting academic information...",
+                "Comparing with curriculum database...",
+                "Calculating similarities between subjects...",
+                "Applying validation algorithms...",
+                "Generating final report..."
+            ]
+        },
+        "results": {
+            "title": "Report Generated",
+            "summary": "Validation Summary",
+            "convalidable": "Validatable",
+            "review": "Under Review",
+            "rejected": "Not Validatable",
+            "analysis": "Detailed Analysis",
+            "blockchain": "Blockchain",
+            "verification": "Immutable Verification",
+            "reportDetails": "Report Details"
+        }
+    },
+    "Contact": {
+        "title": "Contact Us",
+        "subtitle": "We are here to help your institution",
+        "form": {
+            "name": "Full Name",
+            "email": "Institutional Email",
+            "institution": "University / Institution",
+            "message": "Message",
+            "submit": "Send Message"
+        }
+    },
+    "auth": {
+        "login": "Log In",
+        "register": "Create Account",
+        "email": "Email address",
+        "password": "Password",
+        "forgotPassword": "Forgot your password?",
+        "noAccount": "Don't have an account?",
+        "hasAccount": "Already have an account?",
+        "createAccount": "Create account",
+        "loginButton": "Log in",
+        "or": "or",
+        "continueWith": "Continue with",
+        "resetPassword": "Reset Password",
+        "backToLogin": "Back to login",
+        "sendResetLink": "Send reset link",
+        "resetEmailSent": "Email sent",
+        "checkYourEmail": "Check your email to reset your password",
+        "fullName": "Full name",
+        "confirmPassword": "Confirm password",
+        "iAmStudent": "I'm a student",
+        "iAmUniversity": "I'm a university",
+        "institution": "Institution",
+        "acceptTerms": "I accept the",
+        "termsOfService": "terms and conditions",
+        "and": "and the",
+        "privacyPolicy": "privacy policy"
+    },
+    "errors": {
+        "invalidEmail": "Invalid email address",
+        "passwordTooShort": "Password must be at least 6 characters",
+        "passwordMismatch": "Passwords do not match",
+        "nameRequired": "Name is required",
+        "institutionRequired": "Institution is required",
+        "termsRequired": "You must accept the terms and conditions",
+        "loginError": "Error logging in",
+        "registerError": "Error creating account",
+        "genericError": "An error occurred. Please try again."
+    },
+    "passwordStrength": {
+        "weak": "Weak",
+        "fair": "Fair",
+        "good": "Good",
+        "strong": "Strong",
+        "veryStrong": "Very Strong"
+    },
+    "dashboard": {
+        "welcome": "Welcome back",
+        "welcomeMessage": "Your validations portal",
+        "quickAccess": "Quick Access",
+        "statistics": "Your Statistics",
+        "recentActivity": "Recent Activity",
+        "cards": {
+            "newAnalysis": {
+                "title": "New Validation",
+                "description": "Start a new validation analysis",
+                "action": "Get Started"
+            },
+            "history": {
+                "title": "History",
+                "description": "View your previous analyses",
+                "action": "View History"
+            },
+            "demo": {
+                "title": "Interactive Demo",
+                "description": "Try our platform with sample documents",
+                "action": "Go to Demo"
+            },
+            "documentation": {
+                "title": "Documentation",
+                "description": "Guides and resources to get the most out",
+                "action": "View Guides"
+            },
+            "support": {
+                "title": "Support",
+                "description": "Need help? We're here for you",
+                "action": "Contact"
+            },
+            "plans": {
+                "title": "Plans",
+                "description": "Explore our plans and services",
+                "action": "View Plans"
+            }
+        },
+        "stats": {
+            "validations": "Processed Validations",
+            "pending": "Pending Review",
+            "approved": "Approved",
+            "successRate": "Success Rate"
+        },
+        "actions": {
+            "logout": "Log Out",
+            "profile": "My Profile",
+            "settings": "Settings"
+        },
+        "activity": {
+            "noActivity": "No recent activity",
+            "viewAll": "View All"
+        }
+    },
+    "Solucion": {
+        "Hero": {
+            "badge": "Contrasted AI Technology",
+            "title": "The Ultimate Solution for",
+            "highlight": "University Validations",
+            "description": "Contrasted AI technology that transforms weeks of manual work into minutes of automated processing with blockchain traceability and total compliance.",
+            "cta": "View Technical Demo",
+            "secondaryCta": "Try Interactive Demo"
+        },
+        "Problem": {
+            "title": "The Current Problem with Validations",
+            "description": "Current manual processes are inefficient, inconsistent, and opaque, generating frustration for both students and academic registrars.",
+            "items": {
+                "slow": {
+                    "title": "Slow Processes",
+                    "description": "Manual review that can take weeks or months",
+                    "impact": "4-8 weeks average"
+                },
+                "inconsistent": {
+                    "title": "Inconsistent Decisions",
+                    "description": "Variable criteria between reviewers and universities",
+                    "impact": "30% variability"
+                },
+                "opaque": {
+                    "title": "Lack of Transparency",
+                    "description": "No clear explanation of why decisions are made",
+                    "impact": "Low trust"
+                },
+                "untraceable": {
+                    "title": "No Traceability",
+                    "description": "Absence of auditable and verifiable record",
+                    "impact": "Legal risk"
+                }
+            },
+            "transition": "Our Solution",
+            "solutionTitle": "Intelligent and Verifiable Automation",
+            "solutionDescription": "AI pipeline with contrasted rules, verifiable results, and blockchain registration to ensure transparency and total traceability.",
+            "solutions": {
+                "pipeline": {
+                    "title": "Automated AI Pipeline",
+                    "description": "Intelligent analysis of content and competencies",
+                    "benefit": "90% time reduction"
+                },
+                "contrasted": {
+                    "title": "Contrasted Results",
+                    "description": "Transparent decisions with citations and justifications",
+                    "benefit": "100% traceability"
+                },
+                "blockchain": {
+                    "title": "Blockchain Registry",
+                    "description": "Immutable and auditable verification",
+                    "benefit": "Total trust"
+                }
+            }
+        },
+        "Pipeline": {
+            "title": "How It Works: 5-Step Pipeline",
+            "description": "From document ingestion to verifiable blockchain registration, every step is designed to ensure accuracy and transparency.",
+            "steps": {
+                "ingest": {
+                    "title": "Ingestion",
+                    "description": "PDFs/HTML of syllabi + transcript of records",
+                    "details": [
+                        "Automatic content extraction",
+                        "Curriculum structure recognition",
+                        "Academic format validation"
+                    ]
+                },
+                "normalization": {
+                    "title": "Normalization",
+                    "description": "ECTS, hours, type (OB/OP), year/semester, text cleaning",
+                    "details": [
+                        "ECTS credit standardization",
+                        "Subject typology classification",
+                        "Content cleaning and structuring"
+                    ]
+                },
+                "matching": {
+                    "title": "AI Matching (Core)",
+                    "description": "Embeddings + LLM re-ranker + hard filters",
+                    "details": [
+                        "Embeddings for learning outcomes",
+                        "Few-shot LLM re-ranker for syllabus",
+                        "Filters: ΔECTS ≤ threshold, min grade, typology"
+                    ]
+                },
+                "policy": {
+                    "title": "Decision Policy",
+                    "description": "Accept ≥80%; 70–79 \"review\" ±10%; <70 reject",
+                    "details": [
+                        "≥80%: Automatic acceptance",
+                        "70-79%: Review with ±10% margin",
+                        "<70%: Rejection with detailed reasons"
+                    ]
+                },
+                "output": {
+                    "title": "Contrasted Output + Blockchain",
+                    "description": "Origin↔Destination pairs with score, reasons, citations; hash on-chain",
+                    "details": [
+                        "Detailed score with components",
+                        "Textual citations and justifications",
+                        "Hash + metadata on blockchain",
+                        "Complete artifact on IPFS"
+                    ]
+                }
+            },
+            "metrics": {
+                "title": "Pipeline Accuracy and Performance",
+                "similarity": "Similarity threshold",
+                "margin": "Explained margin",
+                "availability": "Availability",
+                "processTime": "Process time"
+            }
+        },
+        "Explainability": {
+            "title": "Total Contrastability: Every Decision Justified",
+            "description": "We don't just automate, we explain. Every validation includes a detailed score, textual citations, and verifiable blockchain registration.",
+            "score": {
+                "title": "Score Breakdown (0-100)",
+                "content": "Content/Syllabus",
+                "outcomes": "Learning Outcomes",
+                "skills": "Competencies",
+                "structure": "Structure/Methodology",
+                "finalScore": "Final Score",
+                "autoAccept": "Recommended automatic acceptance",
+                "manualReview": "Manual review required",
+                "autoReject": "Recommended automatic rejection"
+            },
+            "citations": {
+                "title": "Citations and Justifications",
+                "origin": "Origin Subject",
+                "destination": "Destination Subject",
+                "validations": "Automatic Validations"
+            }
+        },
+        "Compliance": {
+            "title": "Compliance, Security, and Legal Framework",
+            "description": "Designed from day one to comply with GDPR, eIDAS, and the university legal framework. Security and privacy as fundamental pillars.",
+            "items": {
+                "gdpr": {
+                    "title": "GDPR (General Data Protection Regulation)",
+                    "description": "Total compliance with pseudonymization of personal data",
+                    "details": [
+                        "Only hashes and technical IDs on blockchain",
+                        "Pseudonymized personal data",
+                        "Right to be forgotten implemented",
+                        "Granular user consent"
+                    ],
+                    "status": "Certified"
+                },
+                "eidas": {
+                    "title": "eIDAS (Electronic Identification and Trust Services)",
+                    "description": "Ready for institutional signature and digital verification",
+                    "details": [
+                        "Qualified signature compatibility",
+                        "Certified timestamps",
+                        "Institutional identity validation",
+                        "European interoperability"
+                    ],
+                    "status": "Ready"
+                },
+                "transparency": {
+                    "title": "Transparency and Audit",
+                    "description": "Complete traceability of decisions and processes",
+                    "details": [
+                        "Immutable record on blockchain",
+                        "Detailed audit logs",
+                        "Algorithm versioning",
+                        "Access to verifiable history"
+                    ],
+                    "status": "Implemented"
+                },
+                "security": {
+                    "title": "Data Security",
+                    "description": "Advanced protection in storage and transmission",
+                    "details": [
+                        "AES-256 encryption at rest",
+                        "TLS 1.3 for transmission",
+                        "Multi-factor authentication",
+                        "Network segregation"
+                    ],
+                    "status": "ISO 27001"
+                }
+            },
+            "legal": {
+                "title": "Legal and Regulatory Framework",
+                "university": "University Legal Framework",
+                "european": "European Regulations",
+                "privacy": "Data Protection"
+            },
+            "blockchain": {
+                "title": "Blockchain Guarantee",
+                "description": "Every validation is recorded immutably on blockchain, ensuring perpetual verifiability and auditability.",
+                "immutable": "Immutable",
+                "verifiable": "Verifiable",
+                "permanent": "Permanent"
+            },
+            "privacy": {
+                "title": "Privacy by Design",
+                "description": "Only cryptographic hashes and technical metadata are stored on blockchain. Personal data remains pseudonymized and under the control of each institution. The complete document is stored on IPFS with controlled access."
+            }
+        },
+        "Results": {
+            "title": "Real Results from Our Clients",
+            "description": "Verifiable data from institutions that have already transformed their validation processes.",
+            "cases": {
+                "upm": {
+                    "name": "Polytechnic University of Madrid",
+                    "metric1Label": "Time Reduction",
+                    "metric1Sub": "From 6 weeks to 2 days average",
+                    "metric2Label": "Verified annual savings"
+                },
+                "upb": {
+                    "name": "Private University of Barcelona",
+                    "metric1Label": "Student Satisfaction",
+                    "metric1Sub": "Post-implementation survey",
+                    "metric2Label": "Operational cost reduction"
+                },
+                "rua": {
+                    "name": "Andalusian University Network",
+                    "metric1Label": "Validations/Month",
+                    "metric1Sub": "Automated processing",
+                    "metric2Label": "Blockchain traceability"
+                }
+            }
+        }
+    },
+    "CasosUso": {
+        "Hero": {
+            "title": "Use Cases",
+            "highlight": "Real World",
+            "description": "Discover how universities and students across Spain are revolutionizing their validation processes with Certified.",
+            "stats": {
+                "universities": {
+                    "value": "50+",
+                    "label": "Universities"
+                },
+                "students": {
+                    "value": "100K+",
+                    "label": "Students"
+                },
+                "validations": {
+                    "value": "2M+",
+                    "label": "Validations"
+                }
+            }
+        },
+        "UseCases": {
+            "title": "Use Cases and Measurable Benefits",
+            "description": "From Erasmus to international equivalencies, we transform every type of validation with verifiable KPIs and measurable improvements.",
+            "cases": {
+                "erasmus": {
+                    "title": "Erasmus and International Mobility",
+                    "description": "Accelerates recognition of stays in European universities",
+                    "benefits": [
+                        "Time reduction: 8 weeks → 2 days",
+                        "Automatic ECTS compatibility",
+                        "European regulation compliance",
+                        "Verifiable blockchain history"
+                    ],
+                    "metric": "95%",
+                    "metricLabel": "Time reduction"
+                },
+                "interfaculty": {
+                    "title": "Inter-Faculty Recognitions",
+                    "description": "Facilitates transfers between programs within the university",
+                    "benefits": [
+                        "Optimized internal process",
+                        "Unified criteria",
+                        "Institutional traceability",
+                        "Less administrative burden"
+                    ],
+                    "metric": "80%",
+                    "metricLabel": "Less manual work"
+                },
+                "international": {
+                    "title": "International Equivalencies",
+                    "description": "Simplifies validations of foreign degrees",
+                    "benefits": [
+                        "Automatic curricular mapping",
+                        "Comparative database",
+                        "Contrasted reports",
+                        "Speeds up homologations"
+                    ],
+                    "metric": "70%",
+                    "metricLabel": "Fewer inquiries"
+                }
+            },
+            "kpis": {
+                "title": "KPIs: Accuracy, Coverage, and Efficiency",
+                "description": "Verifiable metrics that demonstrate the real impact of Certified",
+                "items": {
+                    "resolutionTime": {
+                        "label": "Resolution Time",
+                        "current": "4-8 weeks",
+                        "certified": "< 3 days",
+                        "improvement": "90% reduction"
+                    },
+                    "accuracy": {
+                        "label": "Accuracy/Acceptance",
+                        "current": "65-75%",
+                        "certified": "95%+",
+                        "improvement": "+25% accuracy"
+                    },
+                    "coverage": {
+                        "label": "Automatic Coverage",
+                        "current": "0%",
+                        "certified": "85%",
+                        "improvement": "Total automation"
+                    },
+                    "falsePositives": {
+                        "label": "False Positives (OB)",
+                        "current": "15-20%",
+                        "certified": "< 3%",
+                        "improvement": "85% reduction"
+                    },
+                    "traceability": {
+                        "label": "Traceability",
+                        "current": "Manual/PDF",
+                        "certified": "Blockchain",
+                        "improvement": "100% auditable"
+                    }
+                }
+            },
+            "successStory": {
+                "badge": "SUCCESS STORY",
+                "university": "Pilot University",
+                "description": "In the 6-month pilot program, we processed 2,847 validation requests with exceptional results.",
+                "metrics": {
+                    "time": {
+                        "label": "Average resolution time",
+                        "value": "2.3 days"
+                    },
+                    "satisfaction": {
+                        "label": "Student satisfaction",
+                        "value": "94%"
+                    },
+                    "adminLoad": {
+                        "label": "Administrative load reduction",
+                        "value": "87%"
+                    },
+                    "appeals": {
+                        "label": "Appeals",
+                        "value": "< 2%"
+                    }
+                },
+                "totalProcessed": "2,847",
+                "totalLabel": "Validations Processed"
+            }
+        }
+    },
+    "Contacto": {
+        "Hero": {
+            "title": "Contact and",
+            "highlight": "Support",
+            "description": "Our team is here to help you. Find quick answers in our FAQ or contact us directly.",
+            "badge": "Response in < 24h • Support in Spanish • No commitment"
+        },
+        "Form": {
+            "title": "Request Your Personalized Demo",
+            "description": "Talk to our team and discover how Certified can transform validation processes at your institution.",
+            "info": {
+                "title": "Contact Information",
+                "email": "Email",
+                "phone": "Phone",
+                "office": "Office",
+                "whyChoose": "Why choose Certified?",
+                "reasons": [
+                    "90% processing time reduction",
+                    "Total contrastability with citations and scores",
+                    "Immutable blockchain traceability",
+                    "Guaranteed GDPR/eIDAS compliance"
+                ],
+                "responseTime": {
+                    "title": "Response Time",
+                    "description": "We respond to all inquiries in less than 24 hours. For urgent demos, contact by phone."
+                }
+            },
+            "fields": {
+                "title": "Request Demo or Information",
+                "name": "Full Name *",
+                "namePlaceholder": "Your name",
+                "email": "Institutional Email *",
+                "emailPlaceholder": "your.email@university.edu",
+                "role": "Role/Position *",
+                "rolePlaceholder": "Select your role",
+                "roles": {
+                    "secretary": "Academic Secretary",
+                    "vicerector": "Vice-Rector",
+                    "coordinator": "Mobility Coordinator",
+                    "director": "Center Director",
+                    "it": "IT Manager",
+                    "other": "Other"
+                },
+                "university": "University/Institution *",
+                "universityPlaceholder": "University of...",
+                "message": "Message",
+                "messagePlaceholder": "Tell us about your specific needs, validation volume, implementation timelines, etc.",
+                "consent": "I accept the processing of my data according to the Privacy Policy and consent to receive commercial information from Certified. *",
+                "submit": "Request Demo",
+                "sending": "Sending...",
+                "disclaimer": "* Required fields. Your data will be treated confidentially and only to manage your request. We do not share information with third parties without your explicit consent."
+            },
+            "success": {
+                "title": "Message Sent Successfully!",
+                "description": "We have received your request. Our team will contact you within a maximum of 24 hours.",
+                "nextSteps": {
+                    "title": "Next Steps",
+                    "steps": [
+                        "Review of your request (2-4 hours)",
+                        "Preparation of personalized demo",
+                        "Direct contact from technical team",
+                        "Proposal adapted to your institution"
+                    ]
+                }
+            }
+        },
+        "PreCheck": {
+            "title": "Are you a Student? Pre-Check your Subjects",
+            "description": "Verify the compatibility of your subjects for free before submitting the official request at your university.",
+            "cta": "Start Free Pre-Check",
+            "disclaimer": "Informative verification only. The final decision is made by your academic registrar."
+        },
+        "FAQ": {
+            "title": "Frequently Asked Questions",
+            "description": "Find answers to the most common questions about Certified. If you don't find what you're looking for, don't hesitate to contact us.",
+            "categories": {
+                "all": "All",
+                "pricing": "Pricing",
+                "process": "Process",
+                "technical": "Technical",
+                "legal": "Legal",
+                "security": "Security",
+                "support": "Support"
+            },
+            "items": {
+                "trial": {
+                    "q": "What does the free trial include?",
+                    "a": "The 30-day trial period includes full access to all Professional plan features, up to 1,000 validations, full technical support, and initial training for your team."
+                },
+                "calculation": {
+                    "q": "How are monthly validations calculated?",
+                    "a": "Each processed academic transcript counts as one validation, regardless of the number of subjects. Partial analyses or drafts do not consume your quota."
+                },
+                "changePlan": {
+                    "q": "Can I change plans at any time?",
+                    "a": "Yes, you can upgrade or downgrade your plan at any time. Changes are applied immediately and the cost is prorated based on usage."
+                },
+                "discounts": {
+                    "q": "Do you offer discounts for multiple years?",
+                    "a": "Yes, we offer 15% discounts for annual contracts and 25% for 3-year contracts. There are also special discounts for university consortiums."
+                },
+                "limit": {
+                    "q": "What happens if I exceed my monthly limit?",
+                    "a": "We notify you when you reach 80% of your limit. You can buy additional packages or automatically upgrade to the next plan."
+                },
+                "implementation": {
+                    "q": "Are there implementation costs?",
+                    "a": "Standard implementation is included in all plans. For complex integrations or specific customizations, we offer additional professional services."
+                },
+                "blockchain": {
+                    "q": "What exactly is stored on blockchain?",
+                    "a": "Only cryptographic hashes, technical metadata (timestamps, algorithm versions), and transaction IDs are stored on blockchain. Personal data is never stored. The complete document with details is stored on IPFS with controlled access."
+                },
+                "algorithm": {
+                    "q": "How exactly is the 80% similarity calculated?",
+                    "a": "The score is calculated using semantic embeddings of content (40%), learning outcomes (30%), competencies (20%), and methodological structure (10%). Each component has specific algorithms and the result is weighted according to these percentages to obtain the final 0-100 score."
+                },
+                "ects": {
+                    "q": "What happens if ECTS do not match exactly?",
+                    "a": "We apply flexible thresholds: ±1 ECTS for 6 ECTS subjects, ±2 for >9 ECTS subjects. If the difference exceeds the threshold, it is marked as \"manual review required\" but the content may still be valid. The system always explains the difference in ECTS."
+                },
+                "signature": {
+                    "q": "Who digitally signs the validations?",
+                    "a": "The platform generates the technical report with score and justifications. The institutional signature is performed by authorized academic registrar personnel using their eIDAS/FNMT certificate. Certified facilitates the process but does not replace institutional authority."
+                },
+                "nonEcts": {
+                    "q": "Does the system work with non-ECTS subjects?",
+                    "a": "Yes, we have conversion modules for US, Asian, and other credit systems. The system first normalizes to equivalent ECTS before content analysis. We also handle teaching hour systems."
+                },
+                "labs": {
+                    "q": "How do you handle practical or lab subjects?",
+                    "a": "Practical subjects are evaluated by methodology, required equipment, technical competencies, and lab time. The algorithm has specific modules for clinical practices, engineering labs, workshops, etc."
+                },
+                "disagreement": {
+                    "q": "What happens if a university disagrees with the result?",
+                    "a": "The system includes an appeal workflow. The institution can mark discrepancy, provide additional information, and request review. Everything is documented on blockchain. The final result is always decided by the competent academic authority."
+                },
+                "security": {
+                    "q": "How do you ensure academic data security?",
+                    "a": "AES-256 encryption at rest, TLS 1.3 in transmission, multi-factor authentication, network segregation, and regular security audits. We comply with ISO 27001 and GDPR. Personal data never leaves the institution's controlled environment."
+                },
+                "learning": {
+                    "q": "Does the system learn and improve over time?",
+                    "a": "Yes, we implement machine learning with feedback from institutional decisions. When a registrar corrects or confirms a result, the system learns for similar future cases. Always preserving privacy and with bias controls."
+                },
+                "time": {
+                    "q": "How long does it take to implement in a university?",
+                    "a": "Typical implementation: 4-8 weeks. Includes SIS integration, team training, specific rule configuration, and testing period. For complex multi-campus implementations, it may take 12-16 weeks."
+                },
+                "support": {
+                    "q": "What support do you offer after implementation?",
+                    "a": "We offer 24/7 technical support, regular algorithm updates, continuous training for new users, and a dedicated customer success manager. We also include proactive monitoring and performance optimization."
+                },
+                "customization": {
+                    "q": "Can we customize similarity thresholds?",
+                    "a": "Yes, each university can configure its own thresholds according to its academic policies. We can adjust the minimum threshold, the weights of each score component, and specific rules by subject type or program."
+                }
+            },
+            "notFound": {
+                "title": "Can't find what you're looking for?",
+                "description": "Our team is here to solve all your doubts. Contact us to get personalized answers.",
+                "ask": "Ask a Question",
+                "email": "Direct Email"
+            }
+        }
+    },
+    "Planes": {
+        "Hero": {
+            "title": "Transparent Plans and Pricing",
+            "subtitle": "Flexible solutions designed for institutions of all sizes. Start for free and scale as you need."
+        },
+        "Plans": {
+            "title": "Plans and Platform Access",
+            "subtitle": "Solutions adapted for institutions of all sizes.",
+            "cta": {
+                "pilot": "Request Pilot",
+                "pro": "Start Pro",
+                "enterprise": "Talk to Sales",
+                "custom": "Request Free Consultation"
+            },
+            "custom": {
+                "title": "Need a Custom Plan?",
+                "description": "Every university has unique needs. Let's talk about how Certified can adapt to your institution."
+            },
+            "items": {
+                "pilot": {
+                    "name": "Pilot",
+                    "description": "Ideal for initial testing and validation",
+                    "price": "Contact",
+                    "features": [
+                        "Up to 100 validations/month",
+                        "Basic AI pipeline",
+                        "Email support",
+                        "Standard documentation",
+                        "Blockchain registration"
+                    ],
+                    "limitations": [
+                        "No customization",
+                        "Limited support"
+                    ]
+                },
+                "pro": {
+                    "name": "Pro",
+                    "description": "For medium-sized universities",
+                    "price": "From €2,500/month",
+                    "features": [
+                        "Up to 1,000 validations/month",
+                        "Advanced pipeline + custom rules",
+                        "Priority support",
+                        "SIS integration",
+                        "Full API",
+                        "Custom dashboards",
+                        "Team training"
+                    ],
+                    "limitations": []
+                },
+                "enterprise": {
+                    "name": "Enterprise",
+                    "description": "For large universities and consortiums",
+                    "price": "Contact",
+                    "features": [
+                        "Unlimited validations",
+                        "On-premise available",
+                        "Guaranteed SLA",
+                        "24/7 support",
+                        "Full customization",
+                        "Multi-campus integration",
+                        "Consulting included",
+                        "Specific compliance"
+                    ],
+                    "limitations": []
+                }
+            }
+        },
+        "CTA": {
+            "title": "Ready to Start?",
+            "description": "Join the universities that are already saving time and money with Certified. No commitment, no risk.",
+            "trialButton": "Start Free Trial",
+            "demoButton": "Request Demo",
+            "faqText": "Have questions about pricing?",
+            "faqLink": "View frequently asked questions"
+        }
+    },
+    "Blog": {
+        "Hero": {
+            "title": "Certified Blog",
+            "subtitle": "Insights, trends, and analysis on the future of digital education and automated academic validations."
+        },
+        "Categories": {
+            "all": "All",
+            "ai_education": "AI & Education",
+            "technology": "Technology",
+            "success_stories": "Success Stories",
+            "trends": "Trends",
+            "privacy": "Privacy",
+            "blockchain": "Blockchain"
+        },
+        "Featured": {
+            "title": "Featured Article",
+            "readArticle": "Read Article"
+        },
+        "Recent": {
+            "title": "Recent Articles",
+            "subtitle": "Stay up to date with the latest trends and developments in digital education"
+        },
+        "Newsletter": {
+            "title": "Don't Miss Anything",
+            "description": "Subscribe to our newsletter and get the latest insights on AI in education directly in your inbox.",
+            "placeholder": "your@email.com",
+            "button": "Subscribe",
+            "disclaimer": "No spam. Cancel anytime."
+        },
+        "Topics": {
+            "title": "Explore by Topics",
+            "subtitle": "Find specific content on the topics that interest you most",
+            "ai": {
+                "title": "Artificial Intelligence",
+                "description": "Latest advances in AI applied to education and academic validations.",
+                "count": "12 articles"
+            },
+            "success": {
+                "title": "Success Stories",
+                "description": "Real stories of universities that have transformed their processes.",
+                "count": "8 articles"
+            },
+            "resources": {
+                "title": "Technical Resources",
+                "description": "Guides, tutorials, and detailed technical documentation.",
+                "count": "15 articles"
+            }
+        },
+        "Posts": [
+            {
+                "id": 1,
+                "title": "The Future of Validations: Contrasted AI in Action",
+                "excerpt": "Discover how contrasted artificial intelligence is revolutionizing the academic validation process, making it faster, more accurate, and transparent.",
+                "author": "Dr. María González",
+                "category": "AI & Education",
+                "readTime": "8 min"
+            },
+            {
+                "id": 2,
+                "title": "GDPR and Academic Data: Complete Guide for Universities",
+                "excerpt": "Everything you need to know about GDPR compliance in handling academic data and university records.",
+                "author": "Elena Martínez",
+                "category": "Privacy",
+                "readTime": "12 min"
+            },
+            {
+                "id": 3,
+                "title": "Blockchain in Education: Beyond Certificates",
+                "excerpt": "We explore innovative applications of blockchain in the education sector, from degree verification to micro-credentials.",
+                "author": "Dr. Carlos Ruiz",
+                "category": "Blockchain",
+                "readTime": "10 min"
+            },
+            {
+                "id": 4,
+                "title": "Success Stories: Polytechnic University and Certified",
+                "excerpt": "Detailed analysis of how the Polytechnic University reduced validation processing time by 95% with Certified.",
+                "author": "Ana López",
+                "category": "Success Stories",
+                "readTime": "6 min"
+            },
+            {
+                "id": 5,
+                "title": "LLM Re-rankers: The Key to Accuracy in Validations",
+                "excerpt": "Technical analysis of how Large Language Models improve accuracy in comparing academic content.",
+                "author": "Dr. Pablo Hernández",
+                "category": "Technology",
+                "readTime": "15 min"
+            },
+            {
+                "id": 6,
+                "title": "Post-Pandemic Student Mobility: New Challenges",
+                "excerpt": "How the pandemic has changed student mobility and what role technology plays in the new normal.",
+                "author": "Dr. Laura Sánchez",
+                "category": "Trends",
+                "readTime": "9 min"
+            }
+        ]
+    },
+    "Privacidad": {
+        "title": "Privacy Policy",
+        "lastUpdated": "Last updated: {date}",
+        "sections": {
+            "info": {
+                "title": "1. Information We Collect",
+                "content": "At Certified, we only collect the information necessary to provide our academic validation services:",
+                "items": [
+                    "Academic data: transcripts, certificates, course guides",
+                    "Contact information: email, phone, university",
+                    "Technical data: usage logs, performance metrics",
+                    "Essential cookies for service operation"
+                ]
+            },
+            "usage": {
+                "title": "2. How We Use Your Data",
+                "content": "Your data is used exclusively for:",
+                "items": [
+                    "Processing academic validations",
+                    "Communication about the status of your requests",
+                    "Improvement of our AI algorithms (anonymized data)",
+                    "Compliance with legal and regulatory obligations"
+                ]
+            },
+            "protection": {
+                "title": "3. Data Protection",
+                "content": "We implement enterprise-grade security measures:",
+                "items": [
+                    "AES-256 encryption for data at rest",
+                    "TLS 1.3 for data in transit",
+                    "Restricted access with multi-factor authentication",
+                    "Regular security audits",
+                    "Secure backup with limited retention"
+                ]
+            },
+            "gdpr": {
+                "title": "4. GDPR Compliance",
+                "content": "As a European company, we strictly comply with GDPR:",
+                "items": [
+                    "Legal basis: consent and legitimate interest",
+                    "Right of access, rectification, and erasure",
+                    "Data portability in standard formats",
+                    "Breach notification within 72 hours",
+                    "Data Protection Officer available"
+                ]
+            },
+            "retention": {
+                "title": "5. Data Retention",
+                "content": "Data is retained only for as long as necessary:",
+                "items": [
+                    "Validation data: according to academic requirements (7 years)",
+                    "Technical logs: 12 months maximum",
+                    "Contact data: until service cancellation",
+                    "Blockchain: permanently anonymized data"
+                ]
+            },
+            "rights": {
+                "title": "6. Your Rights",
+                "content": "You have the right to:",
+                "items": [
+                    "Access your personal data",
+                    "Rectify incorrect information",
+                    "Request erasure of your data",
+                    "Limit processing",
+                    "Object to processing",
+                    "Data portability"
+                ],
+                "contact": "To exercise these rights, contact:"
+            },
+            "contact": {
+                "title": "7. Contact",
+                "dpo": "Data Protection Officer:",
+                "company": "Certified Technologies S.L."
+            }
+        }
+    },
+    "Terminos": {
+        "title": "Terms of Service",
+        "lastUpdated": "Last updated: {date}",
+        "sections": {
+            "acceptance": {
+                "title": "1. Acceptance of Terms",
+                "content": "By accessing and using Certified, you agree to be legally bound by these terms of service and our privacy policy."
+            },
+            "description": {
+                "title": "2. Service Description",
+                "content": "Certified is an artificial intelligence platform that automates the process of academic credit validation between educational institutions.",
+                "items": [
+                    "Automatic analysis of academic transcripts",
+                    "Comparison of curricular content",
+                    "Generation of validation reports",
+                    "Blockchain traceability of decisions"
+                ]
+            },
+            "acceptableUse": {
+                "title": "3. Acceptable Use",
+                "content": "You agree to:",
+                "items": [
+                    "Provide truthful and updated information",
+                    "Use the service only for legitimate academic purposes",
+                    "Respect intellectual property rights",
+                    "Not interfere with the system operation",
+                    "Comply with all applicable laws"
+                ]
+            },
+            "limitations": {
+                "title": "4. Service Limitations",
+                "content": "The service is provided \"as is\" with the following limitations:",
+                "items": [
+                    "AI decisions are recommendations, not definitive",
+                    "Accuracy depends on the quality of provided data",
+                    "May require human review in complex cases",
+                    "Availability subject to scheduled maintenance"
+                ]
+            },
+            "responsibilities": {
+                "title": "5. User Responsibilities",
+                "content": "As a user, you are responsible for:",
+                "items": [
+                    "Maintaining the confidentiality of your credentials",
+                    "Verifying the accuracy of results",
+                    "Complying with your institution's policies",
+                    "Reporting any issues or errors detected"
+                ]
+            },
+            "ip": {
+                "title": "6. Intellectual Property",
+                "content": "Certified's algorithms, software, and content are protected by intellectual property rights. The data you provide remains your property."
+            },
+            "liability": {
+                "title": "7. Limitation of Liability",
+                "content": "Certified shall not be liable for indirect, consequential, or punitive damages arising from the use of the service."
+            },
+            "modifications": {
+                "title": "8. Modifications",
+                "content": "We reserve the right to modify these terms. Significant changes will be notified 30 days in advance."
+            },
+            "contact": {
+                "title": "9. Contact",
+                "content": "For inquiries about these terms:"
+            }
+        }
+    },
+    "NotFound": {
+        "title": "Page Not Found",
+        "description": "Sorry, the page you are looking for does not exist or has been moved.",
+        "backHome": "Back to Home",
+        "homeButton": "Back to Home"
+    },
+    "historial": {
+        "title": "Analysis History",
+        "subtitle": "View and manage all your previous validation analyses",
+        "backToDashboard": "Back to Dashboard",
+        "newAnalysis": "New Analysis",
+        "searchPlaceholder": "Search by course, university or ID...",
+        "filterByStatus": "Filter by status",
+        "tableAriaLabel": "Analysis history table",
+        "sortByDate": "Sort by date",
+        "sortByScore": "Sort by score",
+        "columns": {
+            "date": "Date",
+            "origin": "Origin",
+            "target": "Target",
+            "status": "Status",
+            "score": "Score",
+            "actions": "Actions"
+        },
+        "status": {
+            "all": "All statuses",
+            "approved": "Approved",
+            "pending": "Under review",
+            "rejected": "Rejected"
+        },
+        "subjects": "subjects",
+        "viewDetails": "View details",
+        "noResults": "No analyses found with the selected filters",
+        "showing": "Showing {from} to {to} of {total} results",
+        "previousPage": "Previous page",
+        "nextPage": "Next page"
+    },
+    "resultados": {
+        "loading": "Loading results...",
+        "backToHistory": "Back to History",
+        "downloadPDF": "Download PDF",
+        "share": "Share",
+        "requestReview": "Request Manual Review",
+        "overallScore": "Overall Score",
+        "scoreBreakdown": "Score Breakdown",
+        "weight": "Weight",
+        "processTime": "Process time",
+        "subjectDetails": "Subject Details",
+        "noEquivalent": "No equivalent",
+        "matchedTopics": "Matched topics",
+        "gaps": "Detected differences",
+        "close": "Close",
+        "cancel": "Cancel",
+        "downloadStarted": "Download started. The PDF will be generated automatically.",
+        "recommendation": {
+            "approve": "Approval Recommended",
+            "partial": "Partial Review Required",
+            "deny": "Not Recommended for Validation"
+        },
+        "scoreDescription": {
+            "high": "High similarity - Automatic validation recommended",
+            "medium": "Medium similarity - Requires manual review",
+            "low": "Low similarity - Validation not recommended"
+        },
+        "breakdown": {
+            "content": "Content/Syllabus",
+            "learningOutcomes": "Learning Outcomes",
+            "credits": "ECTS Credits",
+            "assessment": "Assessment Methods"
+        },
+        "blockchain": {
+            "title": "Blockchain Verification",
+            "block": "Block",
+            "status": "Status",
+            "verified": "Verified"
+        },
+        "shareModal": {
+            "title": "Share Result",
+            "copyLink": "Copy link",
+            "copied": "Link copied!",
+            "sendEmail": "Send by email",
+            "emailSubject": "Validation Result {id}"
+        },
+        "reviewModal": {
+            "title": "Request Manual Review",
+            "description": "An academic expert will review your case personally. This process may take 3-5 business days.",
+            "commentLabel": "Additional comment or context",
+            "commentPlaceholder": "Describe why you believe the results should be different...",
+            "commentHelp": "Provide additional details that may help with the manual review.",
+            "submit": "Submit Request",
+            "successTitle": "Request Submitted!",
+            "successMessage": "We will notify you by email when an expert has reviewed your case."
+        }
+    }
+}

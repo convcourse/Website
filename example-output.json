@@ -1,0 +1,179 @@
+{
+  "match_id": "m_2024_03_15_001",
+  "timestamp": "2024-03-15T10:30:00.000Z",
+  "version": "certified_ai_v1.2",
+  "match_pair": {
+    "origin": {
+      "institution": "Universidad de Madrid",
+      "subject_code": "MAT2001",
+      "subject_name": "Álgebra Lineal",
+      "credits_ects": 6,
+      "type": "OB",
+      "semester": "2º",
+      "academic_year": "2023-24"
+    },
+    "destination": {
+      "institution": "Universidad de Barcelona", 
+      "subject_code": "MATH201",
+      "subject_name": "Matemáticas II",
+      "credits_ects": 6,
+      "type": "OB",
+      "semester": "2º",
+      "academic_year": "2023-24"
+    }
+  },
+  "score": {
+    "total": 83,
+    "components": {
+      "content": {
+        "score": 85,
+        "weight": 40,
+        "weighted_score": 34.0
+      },
+      "learning_outcomes": {
+        "score": 92,
+        "weight": 30,
+        "weighted_score": 27.6
+      },
+      "competencies": {
+        "score": 78,
+        "weight": 20,
+        "weighted_score": 15.6
+      },
+      "structure": {
+        "score": 88,
+        "weight": 10,
+        "weighted_score": 8.8
+      }
+    }
+  },
+  "decision": {
+    "result": "ACCEPTED",
+    "type": "automatic",
+    "threshold": 80,
+    "margin": null,
+    "rationale": "Score en rango de aceptación automática (≥80%). Contenido altamente compatible con resultados de aprendizaje coincidentes."
+  },
+  "validations": {
+    "ects_delta": {
+      "origin": 6,
+      "destination": 6,
+      "difference": 0,
+      "status": "PASS",
+      "threshold": 1
+    },
+    "type_compatibility": {
+      "origin": "OB",
+      "destination": "OB", 
+      "compatible": true,
+      "status": "PASS"
+    },
+    "grade_requirement": {
+      "student_grade": 7.5,
+      "minimum_required": 5.0,
+      "status": "PASS"
+    },
+    "duration_match": {
+      "origin": "semestral",
+      "destination": "semestral",
+      "compatible": true,
+      "status": "PASS"
+    }
+  },
+  "evidence": {
+    "origin_citations": [
+      {
+        "section": "contenidos",
+        "text": "Sistemas de ecuaciones lineales y matrices. Operaciones con matrices."
+      },
+      {
+        "section": "resultados_aprendizaje", 
+        "text": "Resolver sistemas de ecuaciones lineales mediante métodos matriciales"
+      },
+      {
+        "section": "competencias",
+        "text": "Espacios vectoriales y transformaciones lineales. Valores y vectores propios."
+      }
+    ],
+    "destination_citations": [
+      {
+        "section": "contenidos",
+        "text": "Resolución de sistemas lineales mediante matrices. Álgebra matricial."
+      },
+      {
+        "section": "resultados_aprendizaje",
+        "text": "Aplicar métodos matriciales para resolver sistemas lineales"
+      },
+      {
+        "section": "competencias", 
+        "text": "Teoría de espacios vectoriales reales. Diagonalización y valores propios."
+      }
+    ],
+    "semantic_matches": [
+      {
+        "origin": "Sistemas de ecuaciones lineales",
+        "destination": "sistemas lineales",
+        "similarity": 0.94
+      },
+      {
+        "origin": "matrices",
+        "destination": "métodos matriciales", 
+        "similarity": 0.89
+      },
+      {
+        "origin": "valores y vectores propios",
+        "destination": "valores propios",
+        "similarity": 0.91
+      }
+    ]
+  },
+  "metadata": {
+    "processing_time_ms": 1247,
+    "model_versions": {
+      "embedding": "text-embedding-3-large",
+      "reranker": "gpt-4-turbo",
+      "content_extractor": "certified-nlp-v2.1"
+    },
+    "confidence_intervals": {
+      "content": [81, 89],
+      "learning_outcomes": [88, 96],
+      "competencies": [73, 83],
+      "structure": [84, 92]
+    }
+  },
+  "audit_trail": {
+    "blockchain": {
+      "network": "ethereum-sepolia",
+      "transaction_hash": "0x7f9b4c8e2d1a5f3e8c9b2a4d6f1e3c7a9b5d8f2e4c1a6b9d3f7e2c8a5b4d1f6e9c3",
+      "block_number": 5847392,
+      "gas_used": 21420,
+      "timestamp": "2024-03-15T10:30:42.000Z"
+    },
+    "ipfs": {
+      "cid": "QmYjtig7VJQ6XsnUjqqJvj7QaMcCAwtrgNdahSiFofrE7o",
+      "size_bytes": 4087,
+      "pin_status": "pinned"
+    },
+    "signatures": {
+      "ai_system": {
+        "algorithm": "ED25519",
+        "public_key": "0x2f1e3c7a9b5d8f2e4c1a6b9d3f7e2c8a5b4d1f6e9c3a7f9b4c8e2d1a5f3e8c9b",
+        "signature": "0xa1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456"
+      }
+    },
+    "reviewers": [
+      {
+        "id": "system_ai_v1.2",
+        "type": "automatic",
+        "timestamp": "2024-03-15T10:30:00.000Z"
+      }
+    ]
+  },
+  "privacy": {
+    "student_data": "pseudonymized",
+    "personal_identifiers": "hashed",
+    "gdpr_compliant": true,
+    "data_retention_days": 2555,
+    "anonymization_level": "k-anonymity_5"
+  }
+}
