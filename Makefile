@@ -19,11 +19,11 @@ stop-dev-container:
 
 
 build-prod:
-	docker network create convcourse-network
+	docker network create convcourse-network || true
 	docker compose -f docker-compose-prod.yaml build -d
 
 start-prod:
-	docker compose -f docker-compose-prod.yaml up -d --build
+	docker compose -f docker-compose-prod.yaml up -d
 
 stop-prod:
 	docker compose -f docker-compose-prod.yaml stop
