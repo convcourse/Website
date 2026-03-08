@@ -53,7 +53,7 @@ export default function CompleteProfilePage() {
       })
 
       if (response.ok) {
-        router.push('/dashboard')
+        router.push('/perfil')
       } else {
         const data = await response.json()
         setError(data.detail?.message || data.detail || 'Error al completar perfil')
