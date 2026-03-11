@@ -6,6 +6,7 @@ import { CookieBanner } from '@/components/CookieBanner';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { AuthProvider } from '@/components/AuthProvider';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
 
@@ -74,9 +75,10 @@ export default async function RootLayout({
         <meta name="theme-color" content="#3b82f6" />
       </head>
       <body className={`${inter.className} min-h-screen`} suppressHydrationWarning>
-        <NextIntlClientProvider messages={messages}>
-          {/* Skip links for keyboard navigation */}
-          <div className="sr-only focus-within:not-sr-only" suppressHydrationWarning>
+        <AuthProvider>
+          <NextIntlClientProvider messages={messages}>
+            {/* Skip links for keyboard navigation */}
+            <div className="sr-only focus-within:not-sr-only" suppressHydrationWarning>
             <a
               href="#main-content"
               className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary-600 text-white px-4 py-2 rounded-md z-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary-600"
@@ -101,7 +103,8 @@ export default async function RootLayout({
           <CookieBanner />
           <LanguageSwitcher />
           <Analytics />
-        </NextIntlClientProvider>
+          </NextIntlClientProvider>
+        </AuthProvider>
       </body>
     </html>
   );
