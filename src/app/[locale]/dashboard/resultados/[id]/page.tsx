@@ -27,201 +27,13 @@ import {
     Copy,
     Mail
 } from 'lucide-react';
-
-// Mock result data
-const mockResults: Record<string, {
-    id: string;
-    date: string;
-    originCourse: string;
-    originUniversity: string;
-    targetCourse: string;
-    targetUniversity: string;
-    status: 'approved' | 'pending' | 'rejected';
-    overallScore: number;
-    processTime: string;
-    blockchain: {
-        hash: string;
-        block: string;
-        verified: boolean;
-    };
-    scoreBreakdown: {
-        content: number;
-        learningOutcomes: number;
-        credits: number;
-        assessment: number;
-    };
-    subjects: Array<{
-        id: string;
-        origin: string;
-        target: string;
-        originCredits: number;
-        targetCredits: number;
-        score: number;
-        status: 'approved' | 'pending' | 'rejected';
-        matchedTopics: string[];
-        gaps: string[];
-    }>;
-    recommendation: 'approve' | 'partial' | 'deny';
-}> = {
-    'RPT-2025-001': {
-        id: 'RPT-2025-001',
-        date: '2025-12-01',
-        originCourse: 'Ingeniería Informática',
-        originUniversity: 'Universidad de Valencia',
-        targetCourse: 'Grado en Informática',
-        targetUniversity: 'Universidad Politécnica de Madrid',
-        status: 'approved',
-        overallScore: 94,
-        processTime: '1m 45s',
-        blockchain: {
-            hash: '0x7a8b...f9e2',
-            block: '#2,847,592',
-            verified: true
-        },
-        scoreBreakdown: {
-            content: 92,
-            learningOutcomes: 95,
-            credits: 100,
-            assessment: 88
-        },
-        subjects: [
-            {
-                id: '1',
-                origin: 'Programación I',
-                target: 'Fundamentos de Programación',
-                originCredits: 6,
-                targetCredits: 6,
-                score: 96,
-                status: 'approved',
-                matchedTopics: ['Variables y tipos de datos', 'Estructuras de control', 'Funciones', 'Arrays'],
-                gaps: []
-            },
-            {
-                id: '2',
-                origin: 'Álgebra Lineal',
-                target: 'Matemáticas I',
-                originCredits: 6,
-                targetCredits: 6,
-                score: 91,
-                status: 'approved',
-                matchedTopics: ['Matrices', 'Sistemas de ecuaciones', 'Espacios vectoriales'],
-                gaps: ['Transformaciones lineales avanzadas']
-            },
-            {
-                id: '3',
-                origin: 'Bases de Datos',
-                target: 'Gestión de Datos',
-                originCredits: 6,
-                targetCredits: 6,
-                score: 74,
-                status: 'pending',
-                matchedTopics: ['SQL básico', 'Modelo relacional'],
-                gaps: ['NoSQL', 'Big Data']
-            },
-            {
-                id: '4',
-                origin: 'Historia del Arte',
-                target: '',
-                originCredits: 3,
-                targetCredits: 0,
-                score: 0,
-                status: 'rejected',
-                matchedTopics: [],
-                gaps: ['Sin equivalencia en plan destino']
-            }
-        ],
-        recommendation: 'approve'
-    },
-    'RPT-2025-002': {
-        id: 'RPT-2025-002',
-        date: '2025-11-28',
-        originCourse: 'Administración de Empresas',
-        originUniversity: 'Universidad de Barcelona',
-        targetCourse: 'ADE',
-        targetUniversity: 'Universidad Complutense',
-        status: 'pending',
-        overallScore: 76,
-        processTime: '2m 12s',
-        blockchain: {
-            hash: '0x3c4d...a1b2',
-            block: '#2,847,590',
-            verified: true
-        },
-        scoreBreakdown: {
-            content: 78,
-            learningOutcomes: 72,
-            credits: 85,
-            assessment: 70
-        },
-        subjects: [
-            {
-                id: '1',
-                origin: 'Contabilidad I',
-                target: 'Introducción a la Contabilidad',
-                originCredits: 6,
-                targetCredits: 6,
-                score: 88,
-                status: 'approved',
-                matchedTopics: ['Plan General Contable', 'Asientos contables', 'Balance'],
-                gaps: []
-            },
-            {
-                id: '2',
-                origin: 'Marketing',
-                target: 'Fundamentos de Marketing',
-                originCredits: 6,
-                targetCredits: 4,
-                score: 72,
-                status: 'pending',
-                matchedTopics: ['Análisis de mercado', 'Segmentación'],
-                gaps: ['Marketing digital', 'Diferencia de créditos']
-            }
-        ],
-        recommendation: 'partial'
-    },
-    'RPT-2025-003': {
-        id: 'RPT-2025-003',
-        date: '2025-11-25',
-        originCourse: 'Derecho',
-        originUniversity: 'Universidad de Salamanca',
-        targetCourse: 'Grado en Derecho',
-        targetUniversity: 'Universidad de Navarra',
-        status: 'rejected',
-        overallScore: 45,
-        processTime: '1m 30s',
-        blockchain: {
-            hash: '0x9f8e...c3d4',
-            block: '#2,847,588',
-            verified: true
-        },
-        scoreBreakdown: {
-            content: 42,
-            learningOutcomes: 48,
-            credits: 50,
-            assessment: 40
-        },
-        subjects: [
-            {
-                id: '1',
-                origin: 'Derecho Romano',
-                target: 'Historia del Derecho',
-                originCredits: 6,
-                targetCredits: 6,
-                score: 52,
-                status: 'rejected',
-                matchedTopics: ['Conceptos históricos básicos'],
-                gaps: ['Enfoque metodológico diferente', 'Contenido no equivalente']
-            }
-        ],
-        recommendation: 'deny'
-    }
-};
+import { getResultById, type ResultDetail } from '@/lib/dashboard-data';
 
 export default function ResultadosPage({ params }: { params: Promise<{ id: string }> }) {
     const t = useTranslations('resultados');
     const router = useRouter();
     const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null);
-    const [result, setResult] = useState<typeof mockResults[string] | null>(null);
+    const [result, setResult] = useState<ResultDetail | null>(null);
     const [showShareModal, setShowShareModal] = useState(false);
     const [showReviewModal, setShowReviewModal] = useState(false);
     const [reviewComment, setReviewComment] = useState('');
@@ -231,12 +43,14 @@ export default function ResultadosPage({ params }: { params: Promise<{ id: strin
     useEffect(() => {
         params.then(p => {
             setResolvedParams(p);
-            const data = mockResults[p.id];
+            const data = getResultById(p.id);
             if (data) {
                 setResult(data);
+            } else {
+                router.push('/dashboard/historial');
             }
         });
-    }, [params]);
+    }, [params, router]);
 
     if (!resolvedParams || !result) {
         return (

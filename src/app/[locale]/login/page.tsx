@@ -9,6 +9,7 @@ import { Shield, Mail, Lock, Eye, EyeOff, CheckCircle, ArrowRight } from 'lucide
 import { Link, useRouter } from '@/navigation';
 import { trackEvent } from '@/components/Analytics';
 import { useTranslations } from 'next-intl';
+import { ensureHardcodedDashboardUser } from '@/lib/dashboard-data';
 
 
 export default function LoginPage() {
@@ -24,6 +25,7 @@ export default function LoginPage() {
 
   // Check if user is already logged in and redirect to dashboard
   useEffect(() => {
+    ensureHardcodedDashboardUser();
     const currentUser = localStorage.getItem('currentUser');
     if (currentUser) {
       router.push('/dashboard');

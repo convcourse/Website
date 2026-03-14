@@ -142,7 +142,8 @@
             "contact": "Contact",
             "demo": "Interactive Demo"
         },
-        "login": "Client Login"
+        "login": "Client Login",
+        "dashboard": "My Dashboard"
     },
     "Footer": {
         "description": "The standard platform for intelligent university degree validation.",
@@ -278,6 +279,7 @@
     "dashboard": {
         "welcome": "Welcome back",
         "welcomeMessage": "Your validations portal",
+        "previewMode": "Demo mode enabled",
         "quickAccess": "Quick Access",
         "statistics": "Your Statistics",
         "recentActivity": "Recent Activity",
@@ -319,6 +321,12 @@
             "approved": "Approved",
             "successRate": "Success Rate"
         },
+        "trends": {
+            "total": "Historical total",
+            "pending": "Current queue",
+            "approved": "Positive outcomes",
+            "rate": "Period average"
+        },
         "actions": {
             "logout": "Log Out",
             "profile": "My Profile",
@@ -326,7 +334,14 @@
         },
         "activity": {
             "noActivity": "No recent activity",
-            "viewAll": "View All"
+            "viewAll": "View All",
+            "hint": "Your latest reports will appear here automatically",
+            "view": "View report",
+            "status": {
+                "approved": "Approved",
+                "pending": "Under review",
+                "rejected": "Rejected"
+            }
         }
     },
     "Solucion": {

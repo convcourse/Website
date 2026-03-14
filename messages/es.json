@@ -142,7 +142,8 @@
             "contact": "Contacto",
             "demo": "Demo Interactiva"
         },
-        "login": "Acceso Clientes"
+        "login": "Acceso Clientes",
+        "dashboard": "Mi Dashboard"
     },
     "Footer": {
         "description": "La plataforma estándar para la convalidación inteligente de títulos universitarios.",
@@ -278,6 +279,7 @@
     "dashboard": {
         "welcome": "¡Bienvenido/a de nuevo",
         "welcomeMessage": "Tu portal de convalidaciones",
+        "previewMode": "Modo demo activo",
         "quickAccess": "Acceso Rápido",
         "statistics": "Tus Estadísticas",
         "recentActivity": "Actividad Reciente",
@@ -319,6 +321,12 @@
             "approved": "Aprobadas",
             "successRate": "Tasa de Éxito"
         },
+        "trends": {
+            "total": "Total historico",
+            "pending": "En cola actual",
+            "approved": "Resoluciones favorables",
+            "rate": "Media del periodo"
+        },
         "actions": {
             "logout": "Cerrar Sesión",
             "profile": "Mi Perfil",
@@ -326,7 +334,14 @@
         },
         "activity": {
             "noActivity": "No hay actividad reciente",
-            "viewAll": "Ver Todo"
+            "viewAll": "Ver Todo",
+            "hint": "Tus ultimos informes apareceran aqui automaticamente",
+            "view": "Ver informe",
+            "status": {
+                "approved": "Aprobado",
+                "pending": "En revision",
+                "rejected": "Rechazado"
+            }
         }
     },
     "Solucion": {

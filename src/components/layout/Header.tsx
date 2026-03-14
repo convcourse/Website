@@ -10,6 +10,7 @@ import { useTranslations } from 'next-intl';
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const pathname = usePathname();
   const t = useTranslations('Header');
 
@@ -20,9 +21,11 @@ export function Header() {
     { name: t('nav.contact'), href: '/contacto' },
   ];
 
-  // Close mobile menu when route changes
+  // Close mobile menu and refresh auth state when route changes
   useEffect(() => {
     setIsOpen(false);
+    const currentUser = localStorage.getItem('currentUser');
+    setIsLoggedIn(Boolean(currentUser));
   }, [pathname]);
 
   return (
@@ -67,13 +70,13 @@ export function Header() {
                 );
               })}
 
-              {/* Login Button */}
-              <Link href="/login">
+              {/* Auth Button */}
+              <Link href={isLoggedIn ? '/dashboard' : '/login'}>
                 <Button
                   size="sm"
                   className="ml-4 rounded-full px-6 shadow-glow hover:shadow-lg transition-all duration-300"
                 >
-                  {t('login')}
+                  {isLoggedIn ? t('dashboard') : t('login')}
                 </Button>
               </Link>
             </div>
@@ -125,14 +128,14 @@ export function Header() {
                 );
               })}
 
-              {/* Mobile Login Button */}
+              {/* Mobile Auth Button */}
               <div className="pt-4 px-2">
-                <Link href="/login" onClick={() => setIsOpen(false)}>
+                <Link href={isLoggedIn ? '/dashboard' : '/login'} onClick={() => setIsOpen(false)}>
                   <Button
                     className="w-full rounded-xl shadow-md"
                     tabIndex={isOpen ? 0 : -1}
                   >
-                    {t('login')}
+                    {isLoggedIn ? t('dashboard') : t('login')}
                   </Button>
                 </Link>
               </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/navigation';
@@ -23,98 +23,7 @@ import {
     Eye,
     Download
 } from 'lucide-react';
-
-// Mock data for analysis history
-const mockAnalyses = [
-    {
-        id: 'RPT-2025-001',
-        date: '2025-12-01',
-        originCourse: 'Ingeniería Informática',
-        originUniversity: 'Universidad de Valencia',
-        targetCourse: 'Grado en Informática',
-        targetUniversity: 'Universidad Politécnica de Madrid',
-        status: 'approved',
-        score: 94,
-        subjects: 25
-    },
-    {
-        id: 'RPT-2025-002',
-        date: '2025-11-28',
-        originCourse: 'Administración de Empresas',
-        originUniversity: 'Universidad de Barcelona',
-        targetCourse: 'ADE',
-        targetUniversity: 'Universidad Complutense',
-        status: 'pending',
-        score: 76,
-        subjects: 18
-    },
-    {
-        id: 'RPT-2025-003',
-        date: '2025-11-25',
-        originCourse: 'Derecho',
-        originUniversity: 'Universidad de Salamanca',
-        targetCourse: 'Grado en Derecho',
-        targetUniversity: 'Universidad de Navarra',
-        status: 'rejected',
-        score: 45,
-        subjects: 22
-    },
-    {
-        id: 'RPT-2025-004',
-        date: '2025-11-20',
-        originCourse: 'Medicina',
-        originUniversity: 'Universidad de Granada',
-        targetCourse: 'Medicina',
-        targetUniversity: 'Universidad Autónoma de Madrid',
-        status: 'approved',
-        score: 89,
-        subjects: 35
-    },
-    {
-        id: 'RPT-2025-005',
-        date: '2025-11-15',
-        originCourse: 'Arquitectura',
-        originUniversity: 'Universidad de Sevilla',
-        targetCourse: 'Grado en Arquitectura',
-        targetUniversity: 'Universidad de Málaga',
-        status: 'pending',
-        score: 72,
-        subjects: 28
-    },
-    {
-        id: 'RPT-2025-006',
-        date: '2025-11-10',
-        originCourse: 'Psicología',
-        originUniversity: 'Universidad de Murcia',
-        targetCourse: 'Grado en Psicología',
-        targetUniversity: 'Universidad de Oviedo',
-        status: 'approved',
-        score: 91,
-        subjects: 20
-    },
-    {
-        id: 'RPT-2025-007',
-        date: '2025-11-05',
-        originCourse: 'Economía',
-        originUniversity: 'Universidad de Zaragoza',
-        targetCourse: 'Grado en Economía',
-        targetUniversity: 'Universidad Carlos III',
-        status: 'rejected',
-        score: 38,
-        subjects: 15
-    },
-    {
-        id: 'RPT-2025-008',
-        date: '2025-10-30',
-        originCourse: 'Ingeniería Civil',
-        originUniversity: 'Universidad de Cantabria',
-        targetCourse: 'Grado en Ingeniería Civil',
-        targetUniversity: 'Universidad Politécnica de Valencia',
-        status: 'approved',
-        score: 88,
-        subjects: 30
-    }
-];
+import { mockAnalyses } from '@/lib/dashboard-data';
 
 type SortField = 'date' | 'score' | 'subjects';
 type SortOrder = 'asc' | 'desc';
@@ -129,6 +38,10 @@ export default function HistorialPage() {
     const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, statusFilter, sortField, sortOrder]);
 
     // Filter and sort data
     const filteredData = useMemo(() => {

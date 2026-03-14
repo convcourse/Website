@@ -13,43 +13,47 @@ import {
     FileCheck,
     BookOpen,
     HeadphonesIcon,
-    CreditCard,
     TrendingUp,
     Clock,
     CheckCircle,
     Activity,
     History,
-    Plus
+    Plus,
+    Eye
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from '@/navigation';
-
-interface UserData {
-    name: string;
-    email: string;
-    institution: string;
-    userType: 'student' | 'university';
-    registeredAt: string;
-}
+import {
+    type DashboardUser,
+    mockAnalyses,
+    getDashboardStats,
+    getRecentAnalyses,
+    HARDCODED_DASHBOARD_USER_KEY,
+    ensureHardcodedDashboardUser,
+    ensureHardcodedDashboardSession
+} from '@/lib/dashboard-data';
 
 export default function DashboardPage() {
     const t = useTranslations('dashboard');
     const router = useRouter();
-    const [user, setUser] = useState<UserData | null>(null);
+    const [user, setUser] = useState<DashboardUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isPreviewMode, setIsPreviewMode] = useState(false);
 
     useEffect(() => {
-        const currentUser = localStorage.getItem('currentUser');
-        if (!currentUser) {
-            router.push('/login');
-            return;
+        const existingHardcoded = localStorage.getItem(HARDCODED_DASHBOARD_USER_KEY);
+        if (!existingHardcoded) {
+            ensureHardcodedDashboardUser();
+            setIsPreviewMode(true);
         }
 
         try {
-            const userData = JSON.parse(currentUser);
+            const userData = ensureHardcodedDashboardSession();
             setUser(userData);
         } catch (e) {
-            router.push('/login');
+            const fallbackUser = ensureHardcodedDashboardSession();
+            setUser(fallbackUser);
+            setIsPreviewMode(true);
         } finally {
             setIsLoading(false);
         }
@@ -67,6 +71,9 @@ export default function DashboardPage() {
             </div>
         );
     }
+
+    const statsSummary = getDashboardStats(mockAnalyses);
+    const recentAnalyses = getRecentAnalyses(mockAnalyses, 4);
 
     const quickAccessCards = [
         {
@@ -111,32 +118,32 @@ export default function DashboardPage() {
         {
             icon: FileCheck,
             label: t('stats.validations'),
-            value: '0',
-            trend: '+0%',
+            value: String(statsSummary.validations),
+            trend: t('trends.total'),
             color: 'text-primary-600',
             bgColor: 'bg-primary-50'
         },
         {
             icon: Clock,
             label: t('stats.pending'),
-            value: '0',
-            trend: '0',
+            value: String(statsSummary.pending),
+            trend: t('trends.pending'),
             color: 'text-accent-600',
             bgColor: 'bg-accent-50'
         },
         {
             icon: CheckCircle,
             label: t('stats.approved'),
-            value: '0',
-            trend: '+0%',
+            value: String(statsSummary.approved),
+            trend: t('trends.approved'),
             color: 'text-green-600',
             bgColor: 'bg-green-50'
         },
         {
             icon: TrendingUp,
             label: t('stats.successRate'),
-            value: '0%',
-            trend: '+0%',
+            value: `${statsSummary.successRate}%`,
+            trend: t('trends.rate'),
             color: 'text-purple-600',
             bgColor: 'bg-purple-50'
         }
@@ -175,12 +182,17 @@ export default function DashboardPage() {
 
                                 <div>
                                     <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-                                        {t('welcome')}, {user.name}! 👋
+                                        {t('welcome')}, {user.name}
                                     </h1>
                                     <p className="text-lg text-gray-600 flex items-center gap-2">
                                         <Building2 className="h-5 w-5" />
                                         {user.institution}
                                     </p>
+                                    {isPreviewMode && (
+                                        <span className="inline-flex mt-3 items-center rounded-full bg-primary-100 text-primary-700 px-3 py-1 text-xs font-semibold">
+                                            {t('previewMode')}
+                                        </span>
+                                    )}
                                 </div>
                             </div>
 
@@ -273,12 +285,39 @@ export default function DashboardPage() {
                 >
                     <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('recentActivity')}</h2>
                     <div className="bg-white/95 backdrop-blur-md shadow-lg rounded-xl border border-gray-200/30 p-8">
-                        <div className="text-center py-12">
-                            <Activity className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                            <p className="text-gray-500 text-lg">{t('activity.noActivity')}</p>
-                            <p className="text-gray-400 text-sm mt-2">
-                                Las convalidaciones que proceses aparecerán aquí
-                            </p>
+                        <div className="space-y-4">
+                            {recentAnalyses.length > 0 ? recentAnalyses.map((item) => (
+                                <div key={item.id} className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 rounded-xl border border-gray-100 p-4">
+                                    <div className="min-w-0">
+                                        <p className="text-sm font-semibold text-gray-900 truncate">{item.originCourse} - {item.targetCourse}</p>
+                                        <p className="text-xs text-gray-500">{new Date(item.date).toLocaleDateString()} - {item.id}</p>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${item.status === 'approved'
+                                            ? 'bg-green-100 text-green-700'
+                                            : item.status === 'pending'
+                                                ? 'bg-amber-100 text-amber-700'
+                                                : 'bg-red-100 text-red-700'
+                                            }`}>
+                                            {t(`activity.status.${item.status}`)}
+                                        </span>
+                                        <Link href={`/dashboard/resultados/${item.id}`}>
+                                            <Button size="sm" variant="outline" className="gap-2">
+                                                <Eye className="h-4 w-4" />
+                                                {t('activity.view')}
+                                            </Button>
+                                        </Link>
+                                    </div>
+                                </div>
+                            )) : (
+                                <div className="text-center py-12">
+                                    <Activity className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                                    <p className="text-gray-500 text-lg">{t('activity.noActivity')}</p>
+                                    <p className="text-gray-400 text-sm mt-2">
+                                        {t('activity.hint')}
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </motion.div>
