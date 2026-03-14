@@ -332,6 +332,13 @@
             "profile": "My Profile",
             "settings": "Settings"
         },
+        "profile": {
+            "id": "User ID",
+            "memberSince": "Member since",
+            "sourceDemo": "Demo data",
+            "sourceBackend": "Backend data",
+            "universitySite": "University site"
+        },
         "activity": {
             "noActivity": "No recent activity",
             "viewAll": "View All",

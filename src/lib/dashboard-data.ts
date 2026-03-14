@@ -2,11 +2,35 @@ export type ValidationStatus = 'approved' | 'pending' | 'rejected';
 export type RecommendationStatus = 'approve' | 'partial' | 'deny';
 
 export interface DashboardUser {
+  id: number | null;
+  firstName: string;
+  lastName: string;
   name: string;
   email: string;
   institution: string;
+  university: {
+    id: number | null;
+    number: string;
+    logo: string;
+    url: string;
+  };
   userType: 'student' | 'university';
   registeredAt: string;
+  dataSource: 'demo' | 'backend';
+}
+
+export interface BackendUserResponse {
+  id: number;
+  name: string;
+  email: string;
+  apellido1: string;
+  apellido2: string | null;
+  universidad: {
+    id: number;
+    number: string;
+    logo: string;
+    url: string;
+  };
 }
 
 export interface AnalysisRecord {
@@ -59,11 +83,21 @@ export interface ResultDetail {
 }
 
 export const mockDashboardUser: DashboardUser = {
+  id: null,
+  firstName: 'Alex',
+  lastName: '',
   name: 'Alex',
   email: 'demo@certified.local',
   institution: 'Universidad Politecnica de Madrid',
+  university: {
+    id: null,
+    number: 'Universidad Politecnica de Madrid',
+    logo: '',
+    url: ''
+  },
   userType: 'student',
-  registeredAt: '2025-10-20'
+  registeredAt: '2025-10-20',
+  dataSource: 'demo'
 };
 
 export const HARDCODED_DASHBOARD_USER_KEY = `user_${mockDashboardUser.email}`;
@@ -98,6 +132,52 @@ export function ensureHardcodedDashboardSession() {
   const hardcodedUser = ensureHardcodedDashboardUser();
   localStorage.setItem('currentUser', JSON.stringify(hardcodedUser));
   return hardcodedUser;
+}
+
+export function mapBackendUserToDashboardUser(
+  backendUser: BackendUserResponse,
+  fallback?: DashboardUser
+): DashboardUser {
+  const lastNames = [backendUser.apellido1, backendUser.apellido2]
+    .filter(Boolean)
+    .join(' ')
+    .trim();
+
+  return {
+    id: backendUser.id,
+    firstName: backendUser.name,
+    lastName: lastNames,
+    name: `${backendUser.name} ${lastNames}`.trim(),
+    email: backendUser.email,
+    institution: backendUser.universidad.number || fallback?.institution || 'Universidad asociada',
+    university: {
+      id: backendUser.universidad.id,
+      number: backendUser.universidad.number,
+      logo: backendUser.universidad.logo,
+      url: backendUser.universidad.url
+    },
+    userType: fallback?.userType || 'student',
+    registeredAt: fallback?.registeredAt || new Date().toISOString(),
+    dataSource: 'backend'
+  };
+}
+
+export async function fetchDashboardUserFromApi(email: string, fallback?: DashboardUser) {
+  const response = await fetch(`/api/user?email=${encodeURIComponent(email)}`, {
+    method: 'GET',
+    cache: 'no-store'
+  });
+
+  if (!response.ok) {
+    return null;
+  }
+
+  const payload = (await response.json()) as { user?: BackendUserResponse };
+  if (!payload.user) {
+    return null;
+  }
+
+  return mapBackendUserToDashboardUser(payload.user, fallback);
 }
 
 export const mockAnalyses: AnalysisRecord[] = [

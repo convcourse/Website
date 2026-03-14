@@ -19,18 +19,24 @@ import {
     Activity,
     History,
     Plus,
-    Eye
+    Eye,
+    Mail,
+    CalendarDays,
+    Fingerprint,
+    ExternalLink
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from '@/navigation';
 import {
     type DashboardUser,
+    mockDashboardUser,
     mockAnalyses,
     getDashboardStats,
     getRecentAnalyses,
     HARDCODED_DASHBOARD_USER_KEY,
     ensureHardcodedDashboardUser,
-    ensureHardcodedDashboardSession
+    ensureHardcodedDashboardSession,
+    fetchDashboardUserFromApi
 } from '@/lib/dashboard-data';
 
 export default function DashboardPage() {
@@ -41,22 +47,45 @@ export default function DashboardPage() {
     const [isPreviewMode, setIsPreviewMode] = useState(false);
 
     useEffect(() => {
-        const existingHardcoded = localStorage.getItem(HARDCODED_DASHBOARD_USER_KEY);
-        if (!existingHardcoded) {
-            ensureHardcodedDashboardUser();
-            setIsPreviewMode(true);
-        }
+        let isMounted = true;
 
-        try {
-            const userData = ensureHardcodedDashboardSession();
-            setUser(userData);
-        } catch (e) {
-            const fallbackUser = ensureHardcodedDashboardSession();
-            setUser(fallbackUser);
-            setIsPreviewMode(true);
-        } finally {
-            setIsLoading(false);
-        }
+        const loadDashboardUser = async () => {
+            const existingHardcoded = localStorage.getItem(HARDCODED_DASHBOARD_USER_KEY);
+            if (!existingHardcoded) {
+                ensureHardcodedDashboardUser();
+            }
+
+            const sessionUser = ensureHardcodedDashboardSession();
+            if (!isMounted) {
+                return;
+            }
+
+            setUser(sessionUser);
+            setIsPreviewMode(sessionUser.email === mockDashboardUser.email);
+
+            try {
+                const apiUser = await fetchDashboardUserFromApi(sessionUser.email, sessionUser);
+                if (apiUser && isMounted) {
+                    setUser(apiUser);
+                    localStorage.setItem('currentUser', JSON.stringify(apiUser));
+                    setIsPreviewMode(false);
+                }
+            } catch {
+                if (isMounted && sessionUser.email !== mockDashboardUser.email) {
+                    setIsPreviewMode(true);
+                }
+            } finally {
+                if (isMounted) {
+                    setIsLoading(false);
+                }
+            }
+        };
+
+        loadDashboardUser();
+
+        return () => {
+            isMounted = false;
+        };
     }, [router]);
 
     const handleLogout = () => {
@@ -186,17 +215,43 @@ export default function DashboardPage() {
                                     </h1>
                                     <p className="text-lg text-gray-600 flex items-center gap-2">
                                         <Building2 className="h-5 w-5" />
-                                        {user.institution}
+                                        {user.university.number || user.institution}
                                     </p>
-                                    {isPreviewMode && (
-                                        <span className="inline-flex mt-3 items-center rounded-full bg-primary-100 text-primary-700 px-3 py-1 text-xs font-semibold">
-                                            {t('previewMode')}
+
+                                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                                        <span className="inline-flex items-center rounded-full bg-gray-100 text-gray-700 px-3 py-1 text-xs font-semibold gap-1.5">
+                                            <Mail className="h-3.5 w-3.5" />
+                                            {user.email}
                                         </span>
-                                    )}
+                                        {user.id !== null && (
+                                            <span className="inline-flex items-center rounded-full bg-gray-100 text-gray-700 px-3 py-1 text-xs font-semibold gap-1.5">
+                                                <Fingerprint className="h-3.5 w-3.5" />
+                                                {t('profile.id')}: {user.id}
+                                            </span>
+                                        )}
+                                        <span className="inline-flex items-center rounded-full bg-gray-100 text-gray-700 px-3 py-1 text-xs font-semibold gap-1.5">
+                                            <CalendarDays className="h-3.5 w-3.5" />
+                                            {t('profile.memberSince')}: {new Date(user.registeredAt).toLocaleDateString()}
+                                        </span>
+                                        <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${isPreviewMode
+                                            ? 'bg-primary-100 text-primary-700'
+                                            : 'bg-green-100 text-green-700'
+                                            }`}>
+                                            {isPreviewMode ? t('profile.sourceDemo') : t('profile.sourceBackend')}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
 
                             <div className="flex gap-3">
+                                {user.university.url && (
+                                    <a href={user.university.url} target="_blank" rel="noreferrer">
+                                        <Button variant="outline" className="gap-2">
+                                            <ExternalLink className="h-4 w-4" />
+                                            {t('profile.universitySite')}
+                                        </Button>
+                                    </a>
+                                )}
                                 <Link href="/">
                                     <Button variant="outline" className="gap-2">
                                         <Shield className="h-4 w-4" />
