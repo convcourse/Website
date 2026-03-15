@@ -1,7 +1,7 @@
 PORT:=3000
 
 build-dev:
-	docker network create convcourse-network
+	docker network create convcourse-network || true
 	docker compose -f docker-compose.yaml build
 
 rb-dev:
@@ -20,7 +20,7 @@ stop-dev-container:
 
 build-prod:
 	docker network create convcourse-network || true
-	docker compose -f docker-compose-prod.yaml build -d
+	docker compose -f docker-compose-prod.yaml build
 
 start-prod:
 	docker compose -f docker-compose-prod.yaml up -d
@@ -30,5 +30,4 @@ stop-prod:
 
 stop-prod-container:
 	echo "El front no tiene volumenes"
-
 

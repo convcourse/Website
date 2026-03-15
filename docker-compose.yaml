@@ -18,18 +18,18 @@ services:
       - ./postcss.config.cjs:/app/postcss.config.cjs
       - /app/node_modules
       - /app/.next
+    env_file:
+      - .env.local
     environment:
       - NODE_ENV=development
       - PORT=3000
       - WATCHPACK_POLLING=true
-      # Assumes backend is running on host or another container in the same network
-      - NEXT_PUBLIC_API_URL=http://localhost:8080
     command: npm run dev
     stdin_open: true
     tty: true
+    networks:
+      - convcourse-network
 
 networks:
-  default:
+  convcourse-network:
     external: true
-    name: convcourse-network
-
