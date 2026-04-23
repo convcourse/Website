@@ -14,6 +14,7 @@ import { useTranslations } from 'next-intl';
 export default function LoginPage() {
   const t = useTranslations('auth');
   const tErrors = useTranslations('errors');
+  const apiBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -79,7 +80,7 @@ export default function LoginPage() {
 
     try {
       // 1) Comprobar que el email existe
-      const existsRes = await fetch(`http://localhost:8000/usuarios/email/${encodeURIComponent(email)}`);
+      const existsRes = await fetch(`${apiBaseUrl}/usuarios/email/${encodeURIComponent(email)}`);
       if (!existsRes.ok) {
         showToast('Usuario no registrado. Por favor, regístrate primero.', 'error');
         setErrors({ general: 'Usuario no encontrado' });
@@ -94,7 +95,7 @@ export default function LoginPage() {
       }
 
       // 2) Login
-      const loginRes = await fetch('http://localhost:8000/login', {
+      const loginRes = await fetch(`${apiBaseUrl}/login`, {  
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -136,7 +137,7 @@ export default function LoginPage() {
       showToast('Error al iniciar sesión. Por favor, inténtalo de nuevo.', 'error');
       setErrors({ general: 'Error al iniciar sesión' });
     } catch (error) {
-      showToast('No se pudo conectar con el servidor. Revisa que el backend esté en http://localhost:8000.', 'error');
+      showToast(`No se pudo conectar con el servidor. Revisa que el backend esté en ${apiBaseUrl}.`, 'error');
       setErrors({ general: 'Error de conexión' });
     } finally {
       setIsLoading(false);

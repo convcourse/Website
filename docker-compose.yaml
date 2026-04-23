@@ -23,7 +23,7 @@ services:
       - PORT=3000
       - WATCHPACK_POLLING=true
       # Assumes backend is running on host or another container in the same network
-      - NEXT_PUBLIC_API_URL=http://localhost:8080
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8000}
     command: npm run dev
     stdin_open: true
     tty: true

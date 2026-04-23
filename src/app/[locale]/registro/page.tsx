@@ -14,6 +14,7 @@ export default function RegisterPage() {
   const t = useTranslations('auth');
   const tErrors = useTranslations('errors');
   const tPassword = useTranslations('passwordStrength');
+  const apiBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -52,7 +53,7 @@ export default function RegisterPage() {
   useEffect(() => {
     const loadUniversidades = async () => {
       try {
-        const res = await fetch('http://localhost:8000/universidades');
+        const res = await fetch(`${apiBaseUrl}/universidades`);
         if (!res.ok) throw new Error('Error al cargar universidades');
         const data = await res.json();
         setUniversidades(Array.isArray(data) ? data : []);
@@ -141,7 +142,7 @@ export default function RegisterPage() {
 
     try {
       // Comprobar si ya existe una cuenta con ese email
-      const existsRes = await fetch(`http://localhost:8000/usuarios/email/${encodeURIComponent(formData.email)}`);
+      const existsRes = await fetch(`${apiBaseUrl}/usuarios/email/${encodeURIComponent(formData.email)}`);
       if (existsRes.ok) {
         showToast('Ya existe una cuenta con este correo. Inicia sesión.', 'error');
         setErrors({ general: 'Ya existe una cuenta con este correo. Inicia sesión.' });
@@ -155,7 +156,7 @@ export default function RegisterPage() {
 
       const tipoId = userType === 'university' ? 4 : 3;
 
-      const registerRes = await fetch('http://localhost:8000/register', {
+      const registerRes = await fetch(`${apiBaseUrl}/register`, {  
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -208,7 +209,7 @@ export default function RegisterPage() {
       setIsRedirecting(true);
       router.push('/dashboard');
     } catch (error) {
-      showToast('No se pudo conectar con el servidor. Revisa que el backend esté en http://localhost:8000.', 'error');
+      showToast(`No se pudo conectar con el servidor. Revisa que el backend esté en ${apiBaseUrl}.`, 'error');
       setErrors({ general: 'Error de conexión' });
     } finally {
       setIsLoading(false);
