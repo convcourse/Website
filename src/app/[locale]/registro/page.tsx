@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,7 @@ export default function RegisterPage() {
   const t = useTranslations('auth');
   const tErrors = useTranslations('errors');
   const tPassword = useTranslations('passwordStrength');
+  const apiBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -38,6 +39,34 @@ export default function RegisterPage() {
   const router = useRouter();
   const { toast, showToast, hideToast } = useToast();
 
+  interface Universidad {
+    id: number;
+    number: string;
+    logo: string;
+    url: string;
+  }
+
+  const [universidades, setUniversidades] = useState<Universidad[]>([]);
+  const [isLoadingUniversidades, setIsLoadingUniversidades] = useState(true);
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
+  useEffect(() => {
+    const loadUniversidades = async () => {
+      try {
+        const res = await fetch(`${apiBaseUrl}/universidades`);
+        if (!res.ok) throw new Error('Error al cargar universidades');
+        const data = await res.json();
+        setUniversidades(Array.isArray(data) ? data : []);
+      } catch (e) {
+        showToast('No se pudieron cargar las universidades. Revisa la conexión con el backend.', 'error');
+      } finally {
+        setIsLoadingUniversidades(false);
+      }
+    };
+
+    loadUniversidades();
+  }, [showToast]);
+
   const validateName = (name: string) => {
     if (!name) return tErrors('nameRequired');
     if (name.length < 3) return tErrors('nameRequired'); // Simplified
@@ -53,7 +82,6 @@ export default function RegisterPage() {
 
   const validateInstitution = (institution: string) => {
     if (!institution) return tErrors('institutionRequired');
-    if (institution.length < 3) return tErrors('institutionRequired');
     return '';
   };
 
@@ -112,36 +140,83 @@ export default function RegisterPage() {
     setIsLoading(true);
     trackEvent('register_attempt', { method: 'email', userType });
 
-    // Simulación de registro - guardar datos en localStorage
-    setTimeout(() => {
-      const registerSuccess = Math.random() > 0.2; // 80% éxito
+    try {
+      // Comprobar si ya existe una cuenta con ese email
+      const existsRes = await fetch(`${apiBaseUrl}/usuarios/email/${encodeURIComponent(formData.email)}`);
+      if (existsRes.ok) {
+        showToast('Ya existe una cuenta con este correo. Inicia sesión.', 'error');
+        setErrors({ general: 'Ya existe una cuenta con este correo. Inicia sesión.' });
+        return;
+      }
+      if (existsRes.status !== 404) {
+        showToast('No se pudo comprobar el email. Inténtalo de nuevo.', 'error');
+        setErrors({ general: 'No se pudo comprobar el email' });
+        return;
+      }
 
-      if (!registerSuccess) {
-        showToast('Error al crear la cuenta. Por favor, inténtalo de nuevo.', 'error');
-        setErrors({
-          general: tErrors('registerError'),
-        });
-      } else {
-        // Guardar usuario en localStorage
-        const userData = {
+      const tipoId = userType === 'university' ? 4 : 3;
+
+      const registerRes = await fetch(`${apiBaseUrl}/register`, {  
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           name: formData.name,
           email: formData.email,
-          institution: formData.institution,
-          userType: userType,
-          registeredAt: new Date().toISOString()
-        };
-        localStorage.setItem(`user_${formData.email}`, JSON.stringify(userData));
+          nombrecompleto: formData.name,
+          universidadId: formData.institution,
+          tipoId,
+          password: formData.password,
+        }),
+      });
 
-        showToast('¡Cuenta creada exitosamente! Redirigiendo al login...', 'success');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1500);
+      const rawText = await registerRes.text();
+      let registerData: any = rawText;
+      try {
+        registerData = rawText ? JSON.parse(rawText) : rawText;
+      } catch {
+        registerData = rawText;
       }
+
+      const numericId = typeof registerData === 'number'
+        ? registerData
+        : (typeof registerData === 'string' && registerData.trim() !== '' && !Number.isNaN(Number(registerData)))
+          ? Number(registerData)
+          : null;
+
+      if (!registerRes.ok || numericId === null) {
+        const detail = registerData && typeof registerData === 'object' && 'detail' in registerData ? String(registerData.detail) : '';
+        showToast(detail || 'Error al crear la cuenta. Por favor, inténtalo de nuevo.', 'error');
+        setErrors({ general: detail || tErrors('registerError') });
+        return;
+      }
+
+      const selectedUni = universidades.find((u) => String(u.id) === String(formData.institution));
+      const institutionName = selectedUni?.number ?? '';
+
+      localStorage.setItem('currentUserId', String(numericId));
+      localStorage.setItem('userId', String(numericId));
+      localStorage.setItem('currentUser', JSON.stringify({
+        id: numericId,
+        name: formData.name,
+        email: formData.email,
+        institution: institutionName,
+        tipoId: userType === 'university' ? 4 : 3,
+        userType,
+        registeredAt: new Date().toISOString(),
+      }));
+
+      showToast('¡Cuenta creada! Accediendo al dashboard...', 'success');
+      setIsRedirecting(true);
+      router.push('/dashboard');
+    } catch (error) {
+      showToast(`No se pudo conectar con el servidor. Revisa que el backend esté en ${apiBaseUrl}.`, 'error');
+      setErrors({ general: 'Error de conexión' });
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -161,6 +236,14 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-accent-50 py-24 px-4 sm:px-6 lg:px-8 pt-32">
+      {isRedirecting && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 backdrop-blur-sm">
+          <div className="flex flex-col items-center gap-4 rounded-xl border border-gray-200 bg-white p-6 shadow-xl">
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary-600 border-t-transparent" />
+            <p className="text-sm font-medium text-gray-700">Accediendo al dashboard...</p>
+          </div>
+        </div>
+      )}
       {/* Background Elements */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-primary-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse-slow"></div>
@@ -335,22 +418,29 @@ export default function RegisterPage() {
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
                   <Building2 className={`h-5 w-5 ${errors.institution ? 'text-red-400' : 'text-gray-400'}`} aria-hidden="true" />
                 </div>
-                <Input
+                <select
                   id="institution"
                   name="institution"
-                  type="text"
-                  autoComplete="organization"
                   value={formData.institution}
                   onChange={handleChange}
                   onBlur={(e) => {
                     const error = validateInstitution(e.target.value);
                     if (error) setErrors({ ...errors, institution: error });
                   }}
-                  className={`pl-10 h-12 ${errors.institution ? 'border-red-300 focus-visible:ring-red-600' : ''}`}
-                  placeholder="Universidad Francisco de Vitoria"
+                  disabled={isLoadingUniversidades}
+                  className={`w-full h-12 rounded-md border border-input bg-background px-3 py-2 text-sm pl-10 ${errors.institution ? 'border-red-300 focus-visible:ring-red-600' : ''}`}
                   aria-invalid={!!errors.institution}
                   aria-describedby={errors.institution ? "institution-error" : undefined}
-                />
+                >
+                  <option value="" disabled>
+                    {isLoadingUniversidades ? 'Cargando universidades...' : 'Selecciona tu universidad'}
+                  </option>
+                  {universidades.map((u) => (
+                    <option key={u.id} value={String(u.id)}>
+                      {u.number}
+                    </option>
+                  ))}
+                </select>
               </div>
               {errors.institution && (
                 <motion.p

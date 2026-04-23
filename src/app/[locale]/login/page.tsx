@@ -14,10 +14,12 @@ import { useTranslations } from 'next-intl';
 export default function LoginPage() {
   const t = useTranslations('auth');
   const tErrors = useTranslations('errors');
+  const apiBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({});
   const router = useRouter();
   const { toast, showToast, hideToast } = useToast();
@@ -43,6 +45,20 @@ export default function LoginPage() {
     return '';
   };
 
+  const normalizeUser = (apiUser: any, userEmail: string, userId: number) => {
+    const rawUserType = apiUser?.userType ?? apiUser?.user_type;
+    const userType: 'student' | 'university' = rawUserType === 'university' ? 'university' : 'student';
+
+    return {
+      name: apiUser?.name ?? apiUser?.nombre ?? userEmail.split('@')[0] ?? 'Usuario',
+      email: apiUser?.email ?? userEmail,
+      institution: apiUser?.institution ?? apiUser?.institucion ?? '',
+      userType,
+      registeredAt: apiUser?.registeredAt ?? apiUser?.registered_at ?? new Date().toISOString(),
+      id: userId,
+    };
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
@@ -62,42 +78,83 @@ export default function LoginPage() {
     setIsLoading(true);
     trackEvent('login_attempt', { method: 'email' });
 
-    // Verificar si el usuario existe en localStorage
-    setTimeout(() => {
-      const storedUser = localStorage.getItem(`user_${email}`);
-
-      if (storedUser) {
-        try {
-          const userData = JSON.parse(storedUser);
-          // Guardar sesión actual
-          localStorage.setItem('currentUser', JSON.stringify(userData));
-
-          showToast(`¡Bienvenido/a ${userData.name}! Has iniciado sesión correctamente.`, 'success');
-
-          // Redirect to dashboard
-          setTimeout(() => {
-            router.push('/dashboard');
-          }, 500);
-        } catch (e) {
-          showToast('Error al iniciar sesión. Por favor, inténtalo de nuevo.', 'error');
-          setErrors({
-            general: 'Error al procesar los datos',
-          });
-        }
-      } else {
-        // Usuario no encontrado
+    try {
+      // 1) Comprobar que el email existe
+      const existsRes = await fetch(`${apiBaseUrl}/usuarios/email/${encodeURIComponent(email)}`);
+      if (!existsRes.ok) {
         showToast('Usuario no registrado. Por favor, regístrate primero.', 'error');
-        setErrors({
-          general: 'Usuario no encontrado',
-        });
+        setErrors({ general: 'Usuario no encontrado' });
+        return;
       }
+
+      let apiUser: any = null;
+      try {
+        apiUser = await existsRes.json();
+      } catch {
+        apiUser = null;
+      }
+
+      // 2) Login
+      const loginRes = await fetch(`${apiBaseUrl}/login`, {  
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const rawText = await loginRes.text();
+      let loginData: any = rawText;
+      try {
+        loginData = rawText ? JSON.parse(rawText) : rawText;
+      } catch {
+        loginData = rawText;
+      }
+
+      const numericId = typeof loginData === 'number'
+        ? loginData
+        : (typeof loginData === 'string' && loginData.trim() !== '' && !Number.isNaN(Number(loginData)))
+          ? Number(loginData)
+          : null;
+
+      // 3) Guardar id y redirigir
+      if (numericId !== null) {
+        localStorage.setItem('currentUserId', String(numericId));
+        localStorage.setItem('userId', String(numericId));
+        const currentUser = normalizeUser(apiUser, email, numericId);
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+        showToast(`¡Bienvenido/a ${currentUser.name}! Has iniciado sesión correctamente.`, 'success');
+        setIsRedirecting(true);
+        router.push('/dashboard');
+        return;
+      }
+
+      if (loginData && typeof loginData === 'object' && 'detail' in loginData && loginData.detail === 'Credenciales incorrectas') {
+        showToast('El email o la contraseña está incorrecto. Prueba con otra.', 'error');
+        setErrors({ general: 'Email o contraseña incorrectos' });
+        return;
+      }
+
+      showToast('Error al iniciar sesión. Por favor, inténtalo de nuevo.', 'error');
+      setErrors({ general: 'Error al iniciar sesión' });
+    } catch (error) {
+      showToast(`No se pudo conectar con el servidor. Revisa que el backend esté en ${apiBaseUrl}.`, 'error');
+      setErrors({ general: 'Error de conexión' });
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   // Si no está logueado, mostrar formulario de login
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-accent-50 py-24 px-4 sm:px-6 lg:px-8 pt-32">
+      {isRedirecting && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 backdrop-blur-sm">
+          <div className="flex flex-col items-center gap-4 rounded-xl border border-gray-200 bg-white p-6 shadow-xl">
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary-600 border-t-transparent" />
+            <p className="text-sm font-medium text-gray-700">Accediendo al dashboard...</p>
+          </div>
+        </div>
+      )}
       {/* Background Elements */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-primary-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse-slow"></div>

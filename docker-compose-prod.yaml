@@ -6,13 +6,14 @@ services:
       context: .
       dockerfile: Dockerfile.prod
       args:
-        NEXT_PUBLIC_API_URL: http://backend:8080
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://convalid.sakenaura.com/api}
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
       - PORT=3000
       - NEXT_TELEMETRY_DISABLED=1
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://convalid.sakenaura.com/api}
     networks:
       - convcourse-network
     restart: unless-stopped
