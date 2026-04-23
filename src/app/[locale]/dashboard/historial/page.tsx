@@ -261,7 +261,7 @@ export default function HistorialPage() {
                                     {t('subtitle')}
                                 </p>
                             </div>
-                            <Link href="/demo">
+                            <Link href="/convalidacion">
                                 <Button variant="glow" className="gap-2">
                                     <FileText className="h-4 w-4" />
                                     {t('newAnalysis')}

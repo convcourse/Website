@@ -160,6 +160,7 @@
         "highlight": "Intelligent & Secure",
         "description": "The first platform using contrasted AI to automate academic transcript analysis with 99% accuracy.",
         "cta": "Request Demo",
+        "ctaLoggedIn": "Validate courses",
         "secondaryCta": "View Use Cases",
         "stats": {
             "universities": "Universities",

@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
@@ -12,6 +12,59 @@ interface AuthLayoutProps {
 }
 
 export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
+  const [universityCount, setUniversityCount] = useState<number | null>(null);
+  const [convalidationCount, setConvalidationCount] = useState<number | null>(null);
+  const apiBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const readCount = (data: unknown): number | null => {
+      if (typeof data === 'number') return data;
+      if (Array.isArray(data)) return data.length;
+      if (data && typeof data === 'object') {
+        const obj = data as Record<string, unknown>;
+        const val = obj.count ?? obj.total ?? obj.length;
+        if (typeof val === 'number') return val;
+      }
+      return null;
+    };
+
+    const fetchFirstCount = async (paths: string[]): Promise<number | null> => {
+      for (const path of paths) {
+        try {
+          const res = await fetch(`${apiBaseUrl}${path}`, { cache: 'no-store' });
+          if (!res.ok) continue;
+          const json = await res.json();
+          const count = readCount(json);
+          if (count !== null) return count;
+        } catch {
+          // ignore
+        }
+      }
+      return null;
+    };
+
+    (async () => {
+      const uni = await fetchFirstCount(['/universidades']);
+      const conv = await fetchFirstCount([
+        '/peticiondocumento',
+        '/peticiondocumentos',
+        '/peticion-documento',
+        '/peticiones-documento'
+      ]);
+
+      if (!cancelled) {
+        setUniversityCount(uni);
+        setConvalidationCount(conv);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [apiBaseUrl]);
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-accent-50 py-12 px-4 sm:px-6 lg:px-8">
       {/* Background Elements */}
@@ -67,11 +120,11 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
           </p>
           <div className="flex justify-center items-center space-x-6 text-gray-400">
             <div className="text-center">
-              <div className="text-lg font-bold text-primary-600">[UNIVERSIDADES]</div>
+              <div className="text-lg font-bold text-primary-600">{universityCount !== null ? universityCount.toLocaleString() : '—'}</div>
               <div className="text-xs">Universidades</div>
             </div>
             <div className="text-center">
-              <div className="text-lg font-bold text-accent-600">[CONVALIDACIONES]</div>
+              <div className="text-lg font-bold text-accent-600">{convalidationCount !== null ? convalidationCount.toLocaleString() : '—'}</div>
               <div className="text-xs">Convalidaciones</div>
             </div>
             <div className="text-center">

@@ -4,14 +4,16 @@ import { useState, useEffect } from 'react';
 import { Link } from '@/navigation';
 import { usePathname } from '@/navigation';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Shield } from 'lucide-react';
-import { trackEvent } from '@/components/Analytics';
+import { Menu, X, Shield, User, Building2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const [userType, setUserType] = useState<'student' | 'university' | null>(null);
   const pathname = usePathname();
   const t = useTranslations('Header');
+
+  const isLoggedIn = userType !== null;
 
   // Navigation items
   const navigation = [
@@ -23,6 +25,20 @@ export function Header() {
   // Close mobile menu when route changes
   useEffect(() => {
     setIsOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('currentUser');
+      if (!raw) {
+        setUserType(null);
+        return;
+      }
+      const parsed = JSON.parse(raw);
+      setUserType(parsed?.userType === 'university' ? 'university' : 'student');
+    } catch {
+      setUserType(null);
+    }
   }, [pathname]);
 
   return (
@@ -67,15 +83,33 @@ export function Header() {
                 );
               })}
 
-              {/* Login Button */}
-              <Link href="/login">
-                <Button
-                  size="sm"
-                  className="ml-4 rounded-full px-6 shadow-glow hover:shadow-lg transition-all duration-300"
-                >
-                  {t('login')}
-                </Button>
-              </Link>
+              {/* Login / User */}
+              {isLoggedIn ? (
+                <Link href="/dashboard" aria-label="Abrir dashboard">
+                  <button
+                    type="button"
+                    className="ml-4 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600"
+                  >
+                    <span className="sr-only">Dashboard</span>
+                    <span className="w-10 h-10 bg-gradient-to-br from-primary-500 to-accent-500 rounded-full flex items-center justify-center shadow-lg">
+                      {userType === 'university' ? (
+                        <Building2 className="h-5 w-5 text-white" aria-hidden="true" />
+                      ) : (
+                        <User className="h-5 w-5 text-white" aria-hidden="true" />
+                      )}
+                    </span>
+                  </button>
+                </Link>
+              ) : (
+                <Link href="/login">
+                  <Button
+                    size="sm"
+                    className="ml-4 rounded-full px-6 shadow-glow hover:shadow-lg transition-all duration-300"
+                  >
+                    {t('login')}
+                  </Button>
+                </Link>
+              )}
             </div>
 
             {/* Mobile menu button */}
@@ -125,16 +159,26 @@ export function Header() {
                 );
               })}
 
-              {/* Mobile Login Button */}
+              {/* Mobile Login / User */}
               <div className="pt-4 px-2">
-                <Link href="/login" onClick={() => setIsOpen(false)}>
-                  <Button
-                    className="w-full rounded-xl shadow-md"
-                    tabIndex={isOpen ? 0 : -1}
-                  >
-                    {t('login')}
-                  </Button>
-                </Link>
+                {isLoggedIn ? (
+                  <Link href="/dashboard" onClick={() => setIsOpen(false)}>
+                    <Button className="w-full rounded-xl shadow-md gap-2" tabIndex={isOpen ? 0 : -1}>
+                      {userType === 'university' ? (
+                        <Building2 className="h-4 w-4" aria-hidden="true" />
+                      ) : (
+                        <User className="h-4 w-4" aria-hidden="true" />
+                      )}
+                      Dashboard
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link href="/login" onClick={() => setIsOpen(false)}>
+                    <Button className="w-full rounded-xl shadow-md" tabIndex={isOpen ? 0 : -1}>
+                      {t('login')}
+                    </Button>
+                  </Link>
+                )}
               </div>
             </div>
           </div>
