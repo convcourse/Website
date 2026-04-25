@@ -160,6 +160,7 @@
         "highlight": "Inteligentes y Seguras",
         "description": "La primera plataforma que utiliza IA contrastada para automatizar el análisis de expedientes académicos con 99% de precisión.",
         "cta": "Solicitar Demo",
+        "ctaLoggedIn": "Convalidar asignaturas",
         "secondaryCta": "Ver Casos de Uso",
         "stats": {
             "universities": "Universidades",

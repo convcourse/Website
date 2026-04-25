@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Shield, CheckCircle, Clock } from 'lucide-react';
@@ -10,6 +11,63 @@ import { useRouter } from '@/navigation';
 export function Hero() {
   const t = useTranslations('Hero');
   const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [universityCount, setUniversityCount] = useState<number | null>(null);
+  const [convalidationCount, setConvalidationCount] = useState<number | null>(null);
+  const apiBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+
+  useEffect(() => {
+    setIsLoggedIn(Boolean(localStorage.getItem('currentUser')));
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const readCount = (data: unknown): number | null => {
+      if (typeof data === 'number') return data;
+      if (Array.isArray(data)) return data.length;
+      if (data && typeof data === 'object') {
+        const obj = data as Record<string, unknown>;
+        const val = obj.count ?? obj.total ?? obj.length;
+        if (typeof val === 'number') return val;
+      }
+      return null;
+    };
+
+    const fetchFirstCount = async (paths: string[]): Promise<number | null> => {
+      for (const path of paths) {
+        try {
+          const res = await fetch(`${apiBaseUrl}${path}`, { cache: 'no-store' });
+          if (!res.ok) continue;
+          const json = await res.json();
+          const count = readCount(json);
+          if (count !== null) return count;
+        } catch {
+          // ignore
+        }
+      }
+      return null;
+    };
+
+    (async () => {
+      const uni = await fetchFirstCount(['/universidades']);
+      const conv = await fetchFirstCount([
+        '/peticiondocumento',
+        '/peticiondocumentos',
+        '/peticion-documento',
+        '/peticiones-documento'
+      ]);
+
+      if (!cancelled) {
+        setUniversityCount(uni);
+        setConvalidationCount(conv);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [apiBaseUrl]);
 
   const badges = [
     { icon: CheckCircle, text: '≥80% similitud', color: 'text-accent-600' }, // Could be translated if needed, but maybe technical terms are fine or add to json
@@ -18,8 +76,8 @@ export function Hero() {
   ];
 
   const handleCTAClick = () => {
-    trackEvent('cta_hero_click', { cta_type: 'demo' });
-    router.push('/demo');
+    trackEvent('cta_hero_click', { cta_type: isLoggedIn ? 'convalidacion' : 'demo' });
+    router.push(isLoggedIn ? '/convalidacion' : '/demo');
   };
 
   return (
@@ -86,7 +144,7 @@ export function Hero() {
               className="text-lg px-10 py-6 h-auto rounded-full"
             >
               <CheckCircle className="mr-2 h-5 w-5" />
-              {t('cta')}
+              {isLoggedIn ? t('ctaLoggedIn') : t('cta')}
             </Button>
             <Button
               size="lg"
@@ -111,11 +169,15 @@ export function Hero() {
             </p>
             <div className="flex justify-center items-center space-x-8 text-gray-400" suppressHydrationWarning>
               <div className="text-center" suppressHydrationWarning>
-                <div className="text-2xl font-bold text-primary-600" suppressHydrationWarning>[UNIVERSIDADES]</div>
+                <div className="text-2xl font-bold text-primary-600" suppressHydrationWarning>
+                  {universityCount !== null ? universityCount.toLocaleString() : '—'}
+                </div>
                 <div className="text-sm" suppressHydrationWarning>{t('stats.universities')}</div>
               </div>
               <div className="text-center" suppressHydrationWarning>
-                <div className="text-2xl font-bold text-accent-600" suppressHydrationWarning>[CONVALIDACIONES]</div>
+                <div className="text-2xl font-bold text-accent-600" suppressHydrationWarning>
+                  {convalidationCount !== null ? convalidationCount.toLocaleString() : '—'}
+                </div>
                 <div className="text-sm" suppressHydrationWarning>{t('stats.validations')}</div>
               </div>
               <div className="text-center" suppressHydrationWarning>

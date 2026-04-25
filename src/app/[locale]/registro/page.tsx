@@ -65,7 +65,7 @@ export default function RegisterPage() {
     };
 
     loadUniversidades();
-  }, [showToast]);
+  }, [showToast, apiBaseUrl]);
 
   const validateName = (name: string) => {
     if (!name) return tErrors('nameRequired');

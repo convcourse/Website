@@ -52,7 +52,7 @@ export default function SolucionPage() {
                 {tHero('cta')}
               </Button>
             </Link>
-            <Link href="/demo">
+            <Link href="/convalidacion">
               <Button
                 size="lg"
                 variant="outline"

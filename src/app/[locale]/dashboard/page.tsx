@@ -76,7 +76,7 @@ export default function DashboardPage() {
             title: t('cards.newAnalysis.title'),
             description: t('cards.newAnalysis.description'),
             action: t('cards.newAnalysis.action'),
-            href: '/demo',
+            href: '/convalidacion',
             gradient: 'from-green-500 to-green-600',
             bgGradient: 'from-green-50 to-green-100'
         },
