@@ -678,7 +678,7 @@ export default function ConvalidacionPage() {
                   </div>
 
                   {uploadedFiles['guias-origen']?.previewUrl && uploadedFiles['guias-destino']?.previewUrl && (
-                    <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-soft border border-white/20 p-6">
+                    <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-soft border border-white/20 p-6 w-[90vw] max-w-none relative left-1/2 -translate-x-1/2">
                       <div className="flex items-center justify-between gap-4 mb-4">
                         <h3 className="text-lg font-bold text-primary-900">Documentos PDF</h3>
                         <div className="text-sm text-primary-600">
