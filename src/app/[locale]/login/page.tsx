@@ -48,6 +48,7 @@ export default function LoginPage() {
   const normalizeUser = (apiUser: any, userEmail: string, userId: number) => {
     const rawUserType = apiUser?.userType ?? apiUser?.user_type;
     const userType: 'student' | 'university' = rawUserType === 'university' ? 'university' : 'student';
+    const universidadId = apiUser?.universidad?.id ?? apiUser?.universidadId ?? apiUser?.uni_id ?? null;
 
     return {
       name: apiUser?.name ?? apiUser?.nombre ?? userEmail.split('@')[0] ?? 'Usuario',
@@ -56,6 +57,7 @@ export default function LoginPage() {
       userType,
       registeredAt: apiUser?.registeredAt ?? apiUser?.registered_at ?? new Date().toISOString(),
       id: userId,
+      universidadId,
     };
   };
 

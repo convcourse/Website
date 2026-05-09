@@ -200,6 +200,7 @@ export default function RegisterPage() {
         name: formData.name,
         email: formData.email,
         institution: institutionName,
+        universidadId: Number(formData.institution),
         tipoId: userType === 'university' ? 4 : 3,
         userType,
         registeredAt: new Date().toISOString(),

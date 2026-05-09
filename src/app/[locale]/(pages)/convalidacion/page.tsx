@@ -27,13 +27,24 @@ export default function ConvalidacionPage() {
   const [showDemo, setShowDemo] = useState(false);
   const [uploadedCount, setUploadedCount] = useState(0);
   const createdPreviewUrls = useRef<string[]>([]);
+  const [convalidacionResult, setConvalidacionResult] = useState<any | null>(null);
+  const documentTextsRef = useRef<{
+    guia_origen_texto: string | null;
+    guia_destino_texto: string | null;
+    boletin_calificaciones_texto: string | null;
+  } | null>(null);
+  const convalidacionResultRef = useRef<any>(null);
   const [uploadedFiles, setUploadedFiles] = useState<{ [key: string]: { name: string, size: string, uploaded: boolean, previewUrl?: string } }>({});
   const [currentStep, setCurrentStep] = useState('upload'); // 'upload', 'loading', 'results'
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [loadingMessage, setLoadingMessage] = useState('');
+  const [loadingLogs, setLoadingLogs] = useState<string[]>([]);
+  const [loadingElapsed, setLoadingElapsed] = useState(0);
+  const [loadingError, setLoadingError] = useState<string | null>(null);
   const [uploadNotification, setUploadNotification] = useState<{ show: boolean, fileName: string }>({ show: false, fileName: '' });
   const [dragActive, setDragActive] = useState<string | null>(null);
   const { toast, showToast, hideToast } = useToast();
+  const apiBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '');
 
   const loadingMessages = [
     'Analizando documentos con IA...',
@@ -58,8 +69,8 @@ export default function ConvalidacionPage() {
   const validateFileFormat = (file: File, docId: string): boolean => {
     const fileName = file.name.toLowerCase();
     const allowedExtensions = docId === 'boletin-calificaciones'
-      ? ['.pdf', '.doc', '.docx']
-      : ['.pdf', '.zip', '.7z'];
+      ? ['.pdf']
+      : ['.pdf', '.zip'];
 
     const isValid = allowedExtensions.some(ext => fileName.endsWith(ext));
 
@@ -74,11 +85,90 @@ export default function ConvalidacionPage() {
     return isValid;
   };
 
-  const handleFileUpload = (docId: string, file: File) => {
-    if (file) {
-      // Validate format first
-      if (!validateFileFormat(file, docId)) {
-        return;
+  const handleFileUpload = async (docId: string, file: File) => {
+    if (!file) {
+      return;
+    }
+
+    // Validate format first
+    if (!validateFileFormat(file, docId)) {
+      return;
+    }
+
+    const tipoGuiaOrigen = Number(process.env.NEXT_PUBLIC_TIPO_GUIA_ORIGEN || '');
+    const tipoGuiaDestino = Number(process.env.NEXT_PUBLIC_TIPO_GUIA_DESTINO || '');
+    const tipoBoletin = Number(process.env.NEXT_PUBLIC_TIPO_BOLETIN || '');
+    const tipoId = docId === 'guias-origen'
+      ? tipoGuiaOrigen
+      : docId === 'guias-destino'
+        ? tipoGuiaDestino
+        : tipoBoletin;
+
+    if (!Number.isFinite(tipoId)) {
+      showToast('Configura los IDs de tipo de documento en el frontend.', 'error');
+      return;
+    }
+
+    const storedUserId = localStorage.getItem('currentUserId') || localStorage.getItem('userId');
+    const userId = storedUserId ? Number(storedUserId) : null;
+    let universidadId: number | null = null;
+
+    try {
+      const rawUser = localStorage.getItem('currentUser');
+      if (rawUser) {
+        const parsedUser = JSON.parse(rawUser);
+        const candidateId =
+          parsedUser?.universidadId ??
+          parsedUser?.universidad?.id ??
+          parsedUser?.institutionId ??
+          parsedUser?.uni_id;
+        if (Number.isFinite(Number(candidateId))) {
+          universidadId = Number(candidateId);
+        }
+      }
+    } catch {
+      universidadId = null;
+    }
+
+    if (!Number.isFinite(universidadId) && Number.isFinite(userId)) {
+      try {
+        const res = await fetch(`${apiBaseUrl}/usuarios/id/${userId}`);
+        if (res.ok) {
+          const userData = await res.json();
+          const resolvedUni = userData?.universidad?.id;
+          if (Number.isFinite(Number(resolvedUni))) {
+            universidadId = Number(resolvedUni);
+          }
+        }
+      } catch {
+        universidadId = null;
+      }
+    }
+
+    if (!Number.isFinite(universidadId)) {
+      showToast('No se pudo obtener la universidad del usuario.', 'error');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('id_uni', String(universidadId));
+    formData.append('tipo_id', String(tipoId));
+    formData.append('titulo', file.name.replace(/\.[^/.]+$/, ''));
+    if (Number.isFinite(userId)) {
+      formData.append('user_id', String(userId));
+    }
+
+    try {
+      const res = await fetch(`${apiBaseUrl}/documentos/upload`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const errorBody = await res.json().catch(() => ({}));
+        const errorDetail = errorBody?.detail || 'No se pudo subir el documento.';
+        throw new Error(errorDetail);
       }
 
       // Format file size
@@ -113,6 +203,9 @@ export default function ConvalidacionPage() {
       setTimeout(() => {
         setUploadNotification({ show: false, fileName: '' });
       }, 3000);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Error desconocido al subir.';
+      showToast(message, 'error');
     }
   };
 
@@ -167,9 +260,112 @@ export default function ConvalidacionPage() {
     }
   };
 
-  const handleStartConvalidation = () => {
+  const handleStartConvalidation = async () => {
     setCurrentStep('loading');
     setLoadingProgress(0);
+    setConvalidacionResult(null);
+    setLoadingLogs([]);
+    setLoadingElapsed(0);
+    setLoadingMessage('Iniciando proceso de convalidacion...');
+    setLoadingError(null);
+
+    const startedAt = Date.now();
+    const elapsedInterval = setInterval(() => {
+      setLoadingElapsed(Math.floor((Date.now() - startedAt) / 1000));
+    }, 1000);
+
+    const addLog = (message: string) => {
+      setLoadingLogs((prev) => [...prev.slice(-5), message]);
+    };
+
+    addLog('Validando tipos y usuario...');
+
+    const tipoGuiaOrigen = Number(process.env.NEXT_PUBLIC_TIPO_GUIA_ORIGEN || '');
+    const tipoGuiaDestino = Number(process.env.NEXT_PUBLIC_TIPO_GUIA_DESTINO || '');
+    const tipoBoletin = Number(process.env.NEXT_PUBLIC_TIPO_BOLETIN || '');
+
+    if (!Number.isFinite(tipoGuiaOrigen) || !Number.isFinite(tipoGuiaDestino) || !Number.isFinite(tipoBoletin)) {
+      showToast('Configura NEXT_PUBLIC_TIPO_GUIA_ORIGEN, NEXT_PUBLIC_TIPO_GUIA_DESTINO y NEXT_PUBLIC_TIPO_BOLETIN.', 'error');
+      setLoadingError('Faltan tipos de documento en el frontend.');
+      addLog('Error: tipos de documento no configurados.');
+      clearInterval(elapsedInterval);
+      return;
+    }
+
+    const storedUserId = localStorage.getItem('currentUserId') || localStorage.getItem('userId');
+    const userId = storedUserId ? Number(storedUserId) : null;
+
+    const params = new URLSearchParams({
+      tipo_origen: String(tipoGuiaOrigen),
+      tipo_destino: String(tipoGuiaDestino),
+      tipo_boletin: String(tipoBoletin)
+    });
+    if (Number.isFinite(userId)) {
+      params.append('user_id', String(userId));
+    }
+
+    try {
+      setLoadingMessage('Extrayendo texto de documentos...');
+      setLoadingProgress(20);
+      addLog('Solicitando extraccion de texto...');
+      const res = await fetch(`${apiBaseUrl}/documentos/ultimos/texto?${params.toString()}`);
+      if (!res.ok) {
+        const errorBody = await res.json().catch(() => ({}));
+        const errorDetail = errorBody?.detail || 'No se pudo extraer el texto de los documentos.';
+        throw new Error(errorDetail);
+      }
+      documentTextsRef.current = await res.json();
+      setLoadingProgress(50);
+      addLog('Texto extraido correctamente.');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Error desconocido al extraer texto.';
+      showToast(message, 'error');
+      setLoadingError(message);
+      addLog(`Error: ${message}`);
+      clearInterval(elapsedInterval);
+      return;
+    }
+
+    try {
+      setLoadingMessage('Enviando a OpenRouter...');
+      setLoadingProgress(65);
+      addLog('Llamando al modelo de IA...');
+      const textos = documentTextsRef.current;
+      const requestBody = {
+        guia_origen: textos?.guia_origen_texto || '',
+        guia_destino: textos?.guia_destino_texto || '',
+        boletin: textos?.boletin_calificaciones_texto || '',
+      };
+      console.log('=== CONVALIDACION REQUEST ===');
+      console.log(JSON.stringify(requestBody, null, 2));
+      console.log('=== END CONVALIDACION REQUEST ===');
+      const analysisRes = await fetch(`${apiBaseUrl}/convalidaciones/analizar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!analysisRes.ok) {
+        const errorBody = await analysisRes.json().catch(() => ({}));
+        const errorDetail = errorBody?.detail || 'No se pudo analizar la convalidacion.';
+        throw new Error(errorDetail);
+      }
+
+      convalidacionResultRef.current = await analysisRes.json();
+      console.log('=== CONVALIDACION RESPONSE ===');
+      console.log(JSON.stringify(convalidacionResultRef.current, null, 2));
+      console.log('=== END CONVALIDACION RESPONSE ===');
+      setConvalidacionResult(convalidacionResultRef.current);
+      setLoadingProgress(90);
+      addLog('Analisis completado. Generando reporte...');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Error desconocido al analizar.';
+      showToast(message, 'error');
+      setLoadingError(message);
+      addLog(`Error: ${message}`);
+      clearInterval(elapsedInterval);
+      return;
+    }
 
     // Simulate loading process
     let messageIndex = 0;
@@ -180,6 +376,7 @@ export default function ConvalidacionPage() {
         messageIndex++;
       } else {
         clearInterval(interval);
+        clearInterval(elapsedInterval);
         setTimeout(() => {
           setCurrentStep('results');
         }, 1000);
@@ -196,7 +393,116 @@ export default function ConvalidacionPage() {
     setUploadedFiles({});
     setLoadingProgress(0);
     setLoadingMessage('');
+    setLoadingLogs([]);
+    setLoadingElapsed(0);
+    setLoadingError(null);
+    setConvalidacionResult(null);
   };
+
+  const handleRetryConvalidation = () => {
+    setLoadingError(null);
+    handleStartConvalidation();
+  };
+
+  const resumen = convalidacionResult?.resumen;
+  const materias = Array.isArray(convalidacionResult?.materias) ? convalidacionResult.materias : [];
+  const totalMaterias = Number(resumen?.total_materias || (materias.length > 0 ? materias.length : 1));
+  const convalidables = Number(resumen?.convalidables || (materias.filter((m: any) => m?.estado === 'convalidable').length));
+  const porRevisar = Number(resumen?.por_revisar || (materias.filter((m: any) => m?.estado === 'revision').length));
+  const noConvalidables = Number(resumen?.no_convalidables || (materias.filter((m: any) => m?.estado === 'no_convalidable').length));
+  const creditosConvalidados = Number(resumen?.creditos_convalidados || (materias.filter((m: any) => m?.estado === 'convalidable').reduce((sum: number, m: any) => sum + (Number(m?.ects_destino ?? m?.creditos_destino) || 0), 0)));
+  const creditosRevision = Number(resumen?.creditos_en_revision || (materias.filter((m: any) => m?.estado === 'revision').reduce((sum: number, m: any) => sum + (Number(m?.ects_destino ?? m?.creditos_destino) || 0), 0)));
+  const porcentaje = (value: number) => totalMaterias > 0 ? Math.round((value / totalMaterias) * 100) : 0;
+  const formatearNumero = (value: number | null | undefined) =>
+    typeof value === 'number' && Number.isFinite(value) ? value : 0;
+  const getEstadoStyles = (estado: string) => {
+    if (estado === 'convalidable') {
+      return {
+        badge: 'bg-green-100 text-green-700',
+        border: 'border-l-green-500',
+        icon: CheckCircle,
+        iconClass: 'text-green-600',
+        label: 'Convalidable'
+      };
+    }
+    if (estado === 'revision') {
+      return {
+        badge: 'bg-amber-100 text-amber-700',
+        border: 'border-l-amber-500',
+        icon: AlertTriangle,
+        iconClass: 'text-amber-600',
+        label: 'Revision'
+      };
+    }
+    return {
+      badge: 'bg-red-100 text-red-700',
+      border: 'border-l-red-500',
+      icon: XCircle,
+      iconClass: 'text-red-600',
+      label: 'No convalidable'
+    };
+  };
+
+  const formatValor = (val: number | null | undefined, suffix = '') => {
+    const n = typeof val === 'number' && Number.isFinite(val) ? val : 0;
+    return `${n}${suffix}`;
+  };
+
+  const formatNumeroText = (val: number | null | undefined) => {
+    const n = typeof val === 'number' && Number.isFinite(val) ? val : 0;
+    return n === 0 ? 'N/A' : String(n);
+  };
+
+  const formatNota = (val: number | null | undefined) => {
+    const n = typeof val === 'number' && Number.isFinite(val) ? val : 0;
+    return n === 0 ? '-' : `${n}/10`;
+  };
+
+  const formatBoolean = (val: boolean | null | undefined) => {
+    return val ? 'Si' : 'No';
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score >= 70) return 'bg-green-500';
+    if (score >= 50) return 'bg-amber-500';
+    return 'bg-red-500';
+  };
+
+  const renderScoreBar = (score: number, label: string) => {
+    const color = getScoreColor(score);
+    return (
+      <div className="flex items-center gap-2 text-xs">
+        <span className="w-12 text-primary-600">{label}</span>
+        <div className="flex-1 h-2 bg-primary-100 rounded-full overflow-hidden">
+          <div className={`h-full ${color} rounded-full`} style={{ width: `${Math.min(score, 100)}%` }} />
+        </div>
+        <span className="w-8 text-right font-semibold text-primary-900">{score}%</span>
+      </div>
+    );
+  };
+
+  const advertenciasGlobales = Array.isArray(convalidacionResult?.advertencias) ? convalidacionResult.advertencias : [];
+  const modelVersion = convalidacionResult?.version || process.env.NEXT_PUBLIC_OPENROUTER_MODEL || 'certified_ai_v1';
+  const matchId = convalidacionResult?.match_id || convalidacionResult?.id || crypto.randomUUID();
+  const analysisTimestamp = convalidacionResult?.timestamp ? new Date(convalidacionResult.timestamp).toLocaleString('es-ES') : new Date().toLocaleString('es-ES');
+
+  const materiasEnRevision = materias.filter((m: any) => m?.estado === 'revision').length;
+  const materiasCriticas = materias.filter((m: any) => m?.estado === 'no_convalidable').length;
+  const creditosPendientes = materias.reduce((sum: number, m: any) => sum + (Number(m?.ects_destino) || Number(m?.ects_origen) || 0), 0);
+
+  const scores = materias.map((m: any) => Number(m?.score_final) || 0).filter((s: number) => s > 0);
+  const scorePromedio = scores.length > 0 ? Math.round(scores.reduce((a: number, b: number) => a + b, 0) / scores.length) : 0;
+  const scoreMax = scores.length > 0 ? Math.max(...scores) : 0;
+  const scoreMin = scores.length > 0 ? Math.min(...scores) : 0;
+
+  const [filtroEstado, setFiltroEstado] = useState<string>('todos');
+  const opcionesFiltro = [
+    { key: 'todos', label: 'Todos', count: totalMaterias },
+    { key: 'convalidable', label: 'Convalidados', count: convalidables },
+    { key: 'revision', label: 'Revision', count: porRevisar },
+    { key: 'no_convalidable', label: 'No validados', count: noConvalidables }
+  ];
+  const materiasFiltradas = filtroEstado === 'todos' ? materias : materias.filter((m: any) => m?.estado === filtroEstado);
 
   return (
     <main className="min-h-screen bg-surface-50 pt-16">
@@ -405,7 +711,7 @@ export default function ConvalidacionPage() {
 
                     <div className="bg-blue-50/50 border border-blue-100 rounded-lg p-4 max-w-2xl mx-auto flex items-center justify-center text-blue-700">
                       <Sparkles className="w-5 h-5 mr-2" aria-hidden="true" />
-                      <span className="text-sm font-medium">Guías: PDF, ZIP o 7Z | Boletín: PDF, DOC o DOCX</span>
+                      <span className="text-sm font-medium">Guías: PDF o ZIP | Boletín: PDF</span>
                     </div>
                   </div>
 
@@ -495,7 +801,7 @@ export default function ConvalidacionPage() {
                           <input
                             id={`file-input-${doc.id}`}
                             type="file"
-                            accept={doc.id === 'boletin-calificaciones' ? '.pdf,.doc,.docx' : '.pdf,.zip,.7z'}
+                            accept={doc.id === 'boletin-calificaciones' ? '.pdf' : '.pdf,.zip'}
                             className="hidden"
                             onChange={(e) => {
                               const file = e.target.files?.[0];
@@ -618,7 +924,38 @@ export default function ConvalidacionPage() {
                         transition={{ duration: 0.3 }}
                       />
                     </div>
-                    <p className="text-sm text-primary-400 font-mono">{Math.round(loadingProgress)}%</p>
+                    <p className="text-sm text-primary-400 font-mono">{Math.round(loadingProgress)}% · {loadingElapsed}s</p>
+                    {loadingLogs.length > 0 && (
+                      <div className="mt-6 text-left text-xs text-primary-500 bg-white/70 border border-primary-100 rounded-lg p-4">
+                        <div className="font-semibold text-primary-700 mb-2">Actividad reciente</div>
+                        <div className="space-y-1">
+                          {loadingLogs.map((log, index) => (
+                            <div key={`${log}-${index}`}>• {log}</div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {loadingError && (
+                      <div className="mt-6 border border-red-200 bg-red-50 text-red-700 rounded-lg p-4 text-sm">
+                        <div className="font-semibold mb-2">Se produjo un error</div>
+                        <div className="mb-4 break-words">{loadingError}</div>
+                        <div className="flex flex-wrap gap-3">
+                          <Button onClick={handleRetryConvalidation} size="sm" variant="glow">
+                            Reintentar
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              setLoadingError(null);
+                              setCurrentStep('upload');
+                            }}
+                            size="sm"
+                            variant="outline"
+                          >
+                            Volver a subir
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               )}
@@ -644,34 +981,54 @@ export default function ConvalidacionPage() {
                       Análisis completo de equivalencias académicas con IA contrastada
                     </p>
 
+                    {/* Global Warnings Alert */}
+                    {advertenciasGlobales.length > 0 && (
+                      <div className="mb-6 bg-amber-50 border border-amber-200 rounded-xl p-4 text-left">
+                        <div className="flex items-start">
+                          <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 mr-3 flex-shrink-0" />
+                          <div>
+                            <p className="text-sm font-semibold text-amber-800 mb-2">Avisos Importantes</p>
+                            <ul className="text-sm text-amber-700 space-y-1">
+                              {advertenciasGlobales.map((adv: string, idx: number) => (
+                                <li key={idx}>• {adv}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Enhanced Summary Stats */}
                     <div className="bg-gradient-to-br from-surface-50 to-primary-50/50 rounded-xl p-8 border border-primary-100">
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <div className="text-center relative">
-                          <div className="text-4xl font-bold text-green-600 mb-2">18</div>
+                          <div className="text-4xl font-bold text-green-600 mb-2">{convalidables}</div>
                           <div className="text-sm font-bold text-primary-900 uppercase tracking-wide mb-1">Convalidables</div>
-                          <div className="text-xs text-primary-500">72% del total</div>
+                          <div className="text-xs text-primary-500">{porcentaje(convalidables)}% del total</div>
                           <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 w-px h-12 bg-primary-200"></div>
                         </div>
 
                         <div className="text-center relative">
-                          <div className="text-4xl font-bold text-amber-500 mb-2">4</div>
+                          <div className="text-4xl font-bold text-amber-500 mb-2">{porRevisar}</div>
                           <div className="text-sm font-bold text-primary-900 uppercase tracking-wide mb-1">Por Revisar</div>
-                          <div className="text-xs text-primary-500">16% del total</div>
+                          <div className="text-xs text-primary-500">{porcentaje(porRevisar)}% del total</div>
                           <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 w-px h-12 bg-primary-200"></div>
                         </div>
 
                         <div className="text-center">
-                          <div className="text-4xl font-bold text-red-500 mb-2">3</div>
+                          <div className="text-4xl font-bold text-red-500 mb-2">{noConvalidables}</div>
                           <div className="text-sm font-bold text-primary-900 uppercase tracking-wide mb-1">No Convalidables</div>
-                          <div className="text-xs text-primary-500">12% del total</div>
+                          <div className="text-xs text-primary-500">{porcentaje(noConvalidables)}% del total</div>
                         </div>
                       </div>
 
                       <div className="border-t border-primary-100 mt-8 pt-6">
                         <div className="inline-flex items-center bg-green-100 text-green-800 px-4 py-1.5 rounded-full text-sm font-medium">
                           <Sparkles className="w-4 h-4 mr-2" />
-                          72 créditos convalidados automáticamente
+                          {creditosConvalidados} créditos convalidados automáticamente
+                        </div>
+                        <div className="mt-3 text-sm text-primary-600">
+                          Créditos en revisión: <span className="font-semibold">{creditosRevision}</span>
                         </div>
                       </div>
                     </div>
@@ -714,81 +1071,143 @@ export default function ConvalidacionPage() {
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Main Results List */}
                     <div className="lg:col-span-2 bg-white/80 backdrop-blur-xl rounded-2xl shadow-soft border border-white/20 p-8">
-                      <div className="flex items-center justify-between mb-8">
-                        <h3 className="text-xl font-bold text-primary-900">Análisis Detallado</h3>
-                        <div className="flex space-x-2">
-                          <span className="bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-xs font-medium">
-                            25 materias
-                          </span>
+<div className="flex justify-between items-center mb-8">
+                        <h3 className="text-xl font-bold text-primary-900">Analisis Detallado</h3>
+                        <div className="flex items-center gap-2">
+                          {opcionesFiltro.map(op => (
+                            <button
+                              key={op.key}
+                              onClick={() => setFiltroEstado(op.key)}
+                              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                                filtroEstado === op.key
+                                  ? 'bg-primary-600 text-white'
+                                  : 'bg-primary-100 text-primary-600 hover:bg-primary-200'
+                              }`}
+                            >
+                              {op.label} ({op.count})
+                            </button>
+                          ))}
                         </div>
                       </div>
 
                       <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-                        {/* Example Result Item - Green */}
-                        <Card className="border-l-4 border-l-green-500 border-y-primary-100 border-r-primary-100 shadow-none">
-                          <CardContent className="p-5">
-                            <div className="flex justify-between items-start mb-3">
-                              <div>
-                                <h4 className="font-bold text-primary-900">Matemáticas I → Cálculo Diferencial</h4>
-                                <p className="text-sm text-primary-500">4 créditos | Semestre 1</p>
-                              </div>
-                              <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded">94% Similitud</span>
-                            </div>
-                            <p className="text-sm text-primary-600 mb-3">
-                              <span className="font-semibold text-primary-800">Análisis IA:</span> Coincidencia alta en límites, derivadas y optimización.
-                            </p>
-                            <div className="flex items-center text-xs text-green-600">
-                              <CheckCircle className="w-3 h-3 mr-1" aria-hidden="true" />
-                              <span className="sr-only">Estado: </span>Convalidación Directa Recomendada
-                            </div>
-                          </CardContent>
-                        </Card>
+                        {materiasFiltradas.length === 0 ? (
+                          <div className="text-sm text-primary-500">
+                            No hay resultados para el filtro seleccionado.
+                          </div>
+                        ) : (
+                          materiasFiltradas.map((materia: any, index: number) => {
+                            const estado = materia?.estado || 'no_convalidable';
+                            const styles = getEstadoStyles(estado);
+                            const EstadoIcon = styles.icon;
+                            const asignaturaOrigen = materia?.asignatura_origen || materia?.asignatura_evaluada || 'Asignatura sin nombre';
+                            const asignaturaDestino = materia?.asignatura_destino ? `→ ${materia.asignatura_destino}` : '';
+                            const ectsOrigen = materia?.ects_origen ?? materia?.creditos_origen ?? 0;
+                            const ectsDestino = materia?.ects_destino ?? materia?.creditos_destino ?? 0;
+                            const semestre = materia?.semestre_origen;
+                            const scoreFinal = formatearNumero(materia?.score_final) || 0;
+                            const analisis = materia?.analisis || 'Sin analisis disponible.';
+                            const citaOrigen = materia?.citas?.origen;
+                            const citaDestino = materia?.citas?.destino;
+                            const advertencias = Array.isArray(materia?.advertencias) ? materia.advertencias : [];
 
-                        {/* Example Result Item - Yellow */}
-                        <Card className="border-l-4 border-l-amber-500 border-y-primary-100 border-r-primary-100 shadow-none">
-                          <CardContent className="p-5">
-                            <div className="flex justify-between items-start mb-3">
-                              <div>
-                                <h4 className="font-bold text-primary-900">Estadística Aplicada → Probabilidad</h4>
-                                <p className="text-sm text-primary-500">4 créditos | Semestre 3</p>
-                              </div>
-                              <span className="bg-amber-100 text-amber-700 text-xs font-bold px-2 py-1 rounded">76% Similitud</span>
-                            </div>
-                            <p className="text-sm text-primary-600 mb-3">
-                              <span className="font-semibold text-primary-800">Análisis IA:</span> Diferencias en enfoque práctico vs teórico. Requiere revisión.
-                            </p>
-                            <div className="flex items-center text-xs text-amber-600">
-                              <AlertTriangle className="w-3 h-3 mr-1" aria-hidden="true" />
-                              <span className="sr-only">Estado: </span>Revisión Académica Necesaria
-                            </div>
-                          </CardContent>
-                        </Card>
+                            const scoreComponents = materia?.score_components || materia?.score || {};
+                            const contenidosScore = formatearNumero(scoreComponents?.contenidos || scoreComponents?.content);
+                            const resultadosScore = formatearNumero(scoreComponents?.resultados || scoreComponents?.learning_outcomes);
+                            const competenciasScore = formatearNumero(scoreComponents?.competencias || scoreComponents?.competencies);
+                            const estructuraScore = formatearNumero(scoreComponents?.estructura || scoreComponents?.structure);
 
-                        {/* Example Result Item - Red */}
-                        <Card className="border-l-4 border-l-red-500 border-y-primary-100 border-r-primary-100 shadow-none">
-                          <CardContent className="p-5">
-                            <div className="flex justify-between items-start mb-3">
-                              <div>
-                                <h4 className="font-bold text-primary-900">Historia del Arte</h4>
-                                <p className="text-sm text-primary-500">3 créditos | Electiva</p>
-                              </div>
-                              <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded">23% Similitud</span>
-                            </div>
-                            <p className="text-sm text-primary-600 mb-3">
-                              <span className="font-semibold text-primary-800">Análisis IA:</span> Sin materia equivalente en el plan de destino.
-                            </p>
-                            <div className="flex items-center text-xs text-red-600">
-                              <XCircle className="w-3 h-3 mr-1" aria-hidden="true" />
-                              <span className="sr-only">Estado: </span>No Convalidable
-                            </div>
-                          </CardContent>
-                        </Card>
+                            const validations = materia?.validations || {};
+                            const ectsOk = validations?.ects_delta?.status === 'PASS';
+                            const tipoOk = validations?.type_compatibility?.compatible;
+                            const notaOk = validations?.grade_requirement?.status === 'PASS';
+
+                            return (
+                              <Card
+                                key={`${asignaturaOrigen}-${index}`}
+                                className={`border-l-4 ${styles.border} border-y-primary-100 border-r-primary-100 shadow-none`}
+                              >
+                                <CardContent className="p-5">
+                                  <div className="flex justify-between items-start mb-3">
+                                    <div>
+                                      <h4 className="font-bold text-primary-900">{asignaturaOrigen} {asignaturaDestino}</h4>
+                                      <p className="text-sm text-primary-500">
+                                        {ectsOrigen} creditos{Number.isFinite(semestre) ? ` | Semestre ${semestre}` : ''}
+                                      </p>
+                                    </div>
+                                    <span className={`${styles.badge} text-xs font-bold px-2 py-1 rounded`}>
+                                      {scoreFinal > 0 ? `${scoreFinal}% Similitud` : '—'}
+                                    </span>
+                                  </div>
+
+                                  {(contenidosScore > 0 || resultadosScore > 0 || competenciasScore > 0) && (
+                                    <div className="mb-3 space-y-1">
+                                      {contenidosScore > 0 && renderScoreBar(contenidosScore, 'Cont')}
+                                      {resultadosScore > 0 && renderScoreBar(resultadosScore, 'Res')}
+                                      {competenciasScore > 0 && renderScoreBar(competenciasScore, 'Comp')}
+                                    </div>
+                                  )}
+
+                                  <div className="flex flex-wrap gap-2 mb-3">
+                                    {ectsOk !== null && (
+                                      <span className={`text-xs px-2 py-0.5 rounded ${ectsOk ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                        ECTS {ectsOk ? '✓' : '✗'}
+                                      </span>
+                                    )}
+                                    {tipoOk !== null && (
+                                      <span className={`text-xs px-2 py-0.5 rounded ${tipoOk ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                        Tipo {tipoOk ? '✓' : '✗'}
+                                      </span>
+                                    )}
+                                    {notaOk !== null && (
+                                      <span className={`text-xs px-2 py-0.5 rounded ${notaOk ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                        Nota {notaOk ? '✓' : '✗'}
+                                      </span>
+                                    )}
+                                  </div>
+
+<p className="text-sm text-primary-600 mb-3">
+                                    <span className="font-semibold text-primary-800">Analisis IA:</span> {analisis}
+                                  </p>
+                                  {(citaOrigen || citaDestino) && (
+                                    <div className="text-xs text-primary-500 mb-3 space-y-1">
+                                      {citaOrigen && (
+                                        <div>
+                                          <span className="font-semibold text-primary-700">Origen:</span> “{citaOrigen}”
+                                        </div>
+                                      )}
+                                      {citaDestino && (
+                                        <div>
+                                          <span className="font-semibold text-primary-700">Destino:</span> “{citaDestino}”
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                  {advertencias.length > 0 && (
+                                    <div className="mb-3">
+                                      <div className="text-xs text-amber-600 font-semibold">Advertencias</div>
+                                      <ul className="text-xs text-amber-700">
+                                        {advertencias.map((adv: string, advIndex: number) => (
+                                          <li key={`${adv}-${advIndex}`}>• {adv}</li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  )}
+                                  <div className={`flex items-center text-xs ${styles.iconClass}`}>
+                                    <EstadoIcon className="w-3 h-3 mr-1" aria-hidden="true" />
+                                    <span className="sr-only">Estado: </span>{styles.label}
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            );
+                          })
+                        )}
                       </div>
                     </div>
 
-                    {/* Sidebar Info */}
+{/* Sidebar Info */}
                     <div className="space-y-6">
-                      {/* Blockchain Card */}
+                      {/* AI Analysis Info Card */}
                       <Card className="bg-gradient-to-br from-primary-900 to-primary-800 border-primary-700 text-white">
                         <CardContent className="p-6">
                           <div className="flex items-center mb-6">
@@ -796,54 +1215,66 @@ export default function ConvalidacionPage() {
                               <ShieldCheck className="w-6 h-6 text-accent-400" />
                             </div>
                             <div>
-                              <h4 className="font-bold text-lg">Blockchain</h4>
-                              <p className="text-xs text-primary-200">Verificación Inmutable</p>
+                              <h4 className="font-bold text-lg">Analisis IA</h4>
+                              <p className="text-xs text-primary-200">Reporte de Convalidacion</p>
                             </div>
                           </div>
 
                           <div className="space-y-4 text-sm">
                             <div className="flex justify-between border-b border-white/10 pb-2">
-                              <span className="text-primary-300">Hash:</span>
-                              <span className="font-mono text-accent-300 text-xs">0xa1b...89xyz</span>
+                              <span className="text-primary-300">Match ID:</span>
+                              <span className="font-mono text-accent-300 text-xs truncate max-w-[120px]" title={matchId}>{matchId.slice(0, 12)}...</span>
                             </div>
                             <div className="flex justify-between border-b border-white/10 pb-2">
-                              <span className="text-primary-300">Bloque:</span>
-                              <span className="text-white">#2,847,592</span>
+                              <span className="text-primary-300">Modelo:</span>
+                              <span className="text-white text-xs">{modelVersion}</span>
+                            </div>
+                            <div className="flex justify-between border-b border-white/10 pb-2">
+                              <span className="text-primary-300">Fecha:</span>
+                              <span className="text-white text-xs">{analysisTimestamp}</span>
                             </div>
                             <div className="flex justify-between">
                               <span className="text-primary-300">Estado:</span>
                               <span className="flex items-center text-green-400 text-xs font-bold">
-                                <CheckCircle className="w-3 h-3 mr-1" /> Verificado
+                                <CheckCircle className="w-3 h-3 mr-1" /> Completado
                               </span>
                             </div>
                           </div>
                         </CardContent>
                       </Card>
 
-                      {/* Report Info */}
+                      {/* Risk Indicator Card */}
                       <Card className="border-primary-100 shadow-sm">
                         <CardContent className="p-6">
                           <h4 className="font-bold text-primary-900 mb-4 flex items-center">
-                            <FileText className="w-5 h-5 mr-2 text-primary-500" />
-                            Detalles del Reporte
+                            <AlertTriangle className="w-5 h-5 mr-2 text-amber-500" />
+                            Estado del Proceso
                           </h4>
                           <div className="space-y-3 text-sm">
-                            <div className="flex justify-between">
-                              <span className="text-primary-500">ID:</span>
-                              <span className="font-mono text-primary-900">RPT-2025-100142</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-primary-500">Origen:</span>
-                              <span className="text-primary-900 text-right">Universidad Europea</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-primary-500">Destino:</span>
-                              <span className="text-primary-900 text-right">Politécnica de Madrid</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-primary-500">Vigencia:</span>
-                              <span className="text-primary-900">Oct 2027</span>
-                            </div>
+                            {materiasCriticas > 0 && (
+                              <div className="flex justify-between items-center p-2 bg-red-50 rounded-lg border border-red-100">
+                                <span className="text-red-700">Criticas</span>
+                                <span className="font-bold text-red-600">{materiasCriticas}</span>
+                              </div>
+                            )}
+                            {materiasEnRevision > 0 && (
+                              <div className="flex justify-between items-center p-2 bg-amber-50 rounded-lg border border-amber-100">
+                                <span className="text-amber-700">En Revision</span>
+                                <span className="font-bold text-amber-600">{materiasEnRevision}</span>
+                              </div>
+                            )}
+                            {creditosPendientes > 0 && (
+                              <div className="flex justify-between items-center p-2 bg-blue-50 rounded-lg border border-blue-100">
+                                <span className="text-blue-700">Creditos Pendientes</span>
+                                <span className="font-bold text-blue-600">{creditosPendientes}</span>
+                              </div>
+                            )}
+                            {scorePromedio > 0 && (
+                              <div className="flex justify-between items-center p-2 bg-green-50 rounded-lg border border-green-100">
+                                <span className="text-green-700">Score Promedio</span>
+                                <span className={`font-bold ${getScoreColor(scorePromedio).replace('bg-', 'text-').replace('-500', '-600')}`}>{scorePromedio}%</span>
+                              </div>
+                            )}
                           </div>
                         </CardContent>
                       </Card>
