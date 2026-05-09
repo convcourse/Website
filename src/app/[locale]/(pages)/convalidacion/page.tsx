@@ -46,15 +46,6 @@ export default function ConvalidacionPage() {
   const { toast, showToast, hideToast } = useToast();
   const apiBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '');
 
-  const loadingMessages = [
-    'Analizando documentos con IA...',
-    'Extrayendo información académica...',
-    'Comparando con base de datos de currículos...',
-    'Calculando similitudes entre materias...',
-    'Aplicando algoritmos de convalidación...',
-    'Generando reporte final...'
-  ];
-
   const handleStartDemo = () => {
     setShowDemo(true);
   };
@@ -278,8 +269,9 @@ export default function ConvalidacionPage() {
       setLoadingLogs((prev) => [...prev.slice(-5), message]);
     };
 
-    addLog('Validando tipos y usuario...');
-
+    setLoadingMessage('Guardando tus documentos en el servidor...');
+    setLoadingProgress(10);
+    addLog('Validando tipos de documento y usuario...');
     const tipoGuiaOrigen = Number(process.env.NEXT_PUBLIC_TIPO_GUIA_ORIGEN || '');
     const tipoGuiaDestino = Number(process.env.NEXT_PUBLIC_TIPO_GUIA_DESTINO || '');
     const tipoBoletin = Number(process.env.NEXT_PUBLIC_TIPO_BOLETIN || '');
@@ -305,9 +297,9 @@ export default function ConvalidacionPage() {
     }
 
     try {
-      setLoadingMessage('Extrayendo texto de documentos...');
+      setLoadingMessage('Extrayendo texto de tus documentos PDF...');
       setLoadingProgress(20);
-      addLog('Solicitando extraccion de texto...');
+      addLog('Extrayendo texto de documentos...');
       const res = await fetch(`${apiBaseUrl}/documentos/ultimos/texto?${params.toString()}`);
       if (!res.ok) {
         const errorBody = await res.json().catch(() => ({}));
@@ -315,8 +307,9 @@ export default function ConvalidacionPage() {
         throw new Error(errorDetail);
       }
       documentTextsRef.current = await res.json();
-      setLoadingProgress(50);
-      addLog('Texto extraido correctamente.');
+      const textoLen = (documentTextsRef.current?.guia_origen_texto?.length || 0) + (documentTextsRef.current?.guia_destino_texto?.length || 0);
+      setLoadingProgress(30);
+      addLog(`Texto extraido: ${textoLen} caracteres`);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Error desconocido al extraer texto.';
       showToast(message, 'error');
@@ -327,9 +320,9 @@ export default function ConvalidacionPage() {
     }
 
     try {
-      setLoadingMessage('Enviando a OpenRouter...');
-      setLoadingProgress(65);
-      addLog('Llamando al modelo de IA...');
+      setLoadingMessage('Enviando documentos a la IA para analizar...');
+      setLoadingProgress(40);
+      addLog('Enviando a analisis de IA...');
       const textos = documentTextsRef.current;
       const requestBody = {
         guia_origen: textos?.guia_origen_texto || '',
@@ -339,6 +332,11 @@ export default function ConvalidacionPage() {
       console.log('=== CONVALIDACION REQUEST ===');
       console.log(JSON.stringify(requestBody, null, 2));
       console.log('=== END CONVALIDACION REQUEST ===');
+      
+      setLoadingMessage('IA leyendo tu guia de origen...');
+      setLoadingProgress(50);
+      addLog(`Guia origen: ${requestBody.guia_origen.length} caracteres`);
+
       const analysisRes = await fetch(`${apiBaseUrl}/convalidaciones/analizar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -351,13 +349,27 @@ export default function ConvalidacionPage() {
         throw new Error(errorDetail);
       }
 
+      setLoadingMessage('IA procesando y comparando asignaturas...');
+      setLoadingProgress(70);
+      addLog('IA analizando similitud de contenidos...');
+
       convalidacionResultRef.current = await analysisRes.json();
       console.log('=== CONVALIDACION RESPONSE ===');
       console.log(JSON.stringify(convalidacionResultRef.current, null, 2));
       console.log('=== END CONVALIDACION RESPONSE ===');
+      
+      setLoadingMessage('IA verificando resultado en blockchain...');
+      setLoadingProgress(85);
+      addLog(`Analisis completado. Estado: ${convalidacionResultRef.current?.resumen?.convalidables || 0} convalidados`);
+      
+      setLoadingProgress(95);
+      if (convalidacionResultRef.current?.blockchain) {
+        addLog(`Transaccion blockchain: ${convalidacionResultRef.current.blockchain.tx_hash.slice(0, 16)}...`);
+      }
+      
       setConvalidacionResult(convalidacionResultRef.current);
-      setLoadingProgress(90);
-      addLog('Analisis completado. Generando reporte...');
+      setLoadingProgress(100);
+      addLog('Reporte generado correctamente.');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Error desconocido al analizar.';
       showToast(message, 'error');
@@ -367,21 +379,8 @@ export default function ConvalidacionPage() {
       return;
     }
 
-    // Simulate loading process
-    let messageIndex = 0;
-    const interval = setInterval(() => {
-      if (messageIndex < loadingMessages.length) {
-        setLoadingMessage(loadingMessages[messageIndex]);
-        setLoadingProgress(((messageIndex + 1) / loadingMessages.length) * 100);
-        messageIndex++;
-      } else {
-        clearInterval(interval);
-        clearInterval(elapsedInterval);
-        setTimeout(() => {
-          setCurrentStep('results');
-        }, 1000);
-      }
-    }, 2000);
+    clearInterval(elapsedInterval);
+    setTimeout(() => setCurrentStep('results'), 500);
   };
 
   const handleRestartDemo = () => {
@@ -1239,6 +1238,21 @@ export default function ConvalidacionPage() {
                                 <CheckCircle className="w-3 h-3 mr-1" /> Completado
                               </span>
                             </div>
+                            {convalidacionResult?.blockchain && (
+                              <div className="pt-2 border-t border-white/10">
+                                <span className="text-primary-300 text-xs">Blockchain:</span>
+                                <a
+                                  href={convalidacionResult.blockchain.explorer_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center text-accent-400 hover:text-accent-300 text-xs mt-1 truncate"
+                                  title={convalidacionResult.blockchain.tx_hash}
+                                >
+                                  <span className="mr-1">↗</span>
+                                  {convalidacionResult.blockchain.tx_hash.slice(0, 10)}...
+                                </a>
+                              </div>
+                            )}
                           </div>
                         </CardContent>
                       </Card>
