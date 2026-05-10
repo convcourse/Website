@@ -1109,6 +1109,10 @@ export default function ConvalidacionPage() {
                             const citaOrigen = materia?.citas?.origen;
                             const citaDestino = materia?.citas?.destino;
                             const advertencias = Array.isArray(materia?.advertencias) ? materia.advertencias : [];
+                            const notaOrigen = materia?.nota_origen;
+                            const notaSuperada = materia?.nota_superada;
+                            const tipoOrigen = materia?.tipo_origen;
+                            const tipoDestino = materia?.tipo_destino;
 
                             const scoreComponents = materia?.score_components || materia?.score || {};
                             const contenidosScore = formatearNumero(scoreComponents?.contenidos || scoreComponents?.content);
@@ -1116,85 +1120,151 @@ export default function ConvalidacionPage() {
                             const competenciasScore = formatearNumero(scoreComponents?.competencias || scoreComponents?.competencies);
                             const estructuraScore = formatearNumero(scoreComponents?.estructura || scoreComponents?.structure);
 
-                            const validations = materia?.validations || {};
-                            const ectsOk = validations?.ects_delta?.status === 'PASS';
-                            const tipoOk = validations?.type_compatibility?.compatible;
-                            const notaOk = validations?.grade_requirement?.status === 'PASS';
+                            const hasEcts = ectsOrigen > 0 && ectsDestino > 0;
 
-                            return (
+return (
                               <Card
                                 key={`${asignaturaOrigen}-${index}`}
-                                className={`border-l-4 ${styles.border} border-y-primary-100 border-r-primary-100 shadow-none`}
+                                className={`border-l-4 ${styles.border} border-y-primary-100 border-r-primary-100`}
                               >
                                 <CardContent className="p-5">
-                                  <div className="flex justify-between items-start mb-3">
-                                    <div>
-                                      <h4 className="font-bold text-primary-900">{asignaturaOrigen} {asignaturaDestino}</h4>
-                                      <p className="text-sm text-primary-500">
+                                  <div className="flex gap-4">
+                                    <div className={`flex flex-col items-center justify-center min-w-[72px] p-3 rounded-xl ${styles.border.replace('border-', 'bg-').replace('border-l-4', '')}`}>
+                                      <div className="relative w-14 h-14">
+                                        <svg className="w-14 h-14 transform -rotate-90" viewBox="0 0 36 36">
+                                          <path
+                                            className="text-primary-100"
+                                            stroke="currentColor"
+                                            strokeWidth="3"
+                                            fill="none"
+                                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                          />
+                                          <path
+                                            className={scoreFinal >= 80 ? 'text-green-500' : scoreFinal >= 70 ? 'text-amber-500' : 'text-red-500'}
+                                            stroke="currentColor"
+                                            strokeWidth="3"
+                                            strokeDasharray={`${scoreFinal}, 100`}
+                                            strokeLinecap="round"
+                                            fill="none"
+                                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                          />
+                                        </svg>
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                          <span className={`text-lg font-bold ${scoreFinal >= 80 ? 'text-green-600' : scoreFinal >= 70 ? 'text-amber-600' : 'text-red-600'}`}>
+                                            {scoreFinal}
+                                          </span>
+                                        </div>
+                                      </div>
+                                      <span className="text-[10px] text-primary-500 font-medium mt-1">Similitud</span>
+                                    </div>
+
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex justify-between items-start mb-1">
+                                        <h4 className="font-bold text-primary-900 text-base leading-tight">{asignaturaOrigen}</h4>
+                                        <span className={`ml-2 ${styles.badge} text-xs font-bold px-2 py-1 rounded-full`}>
+                                          {estado}
+                                        </span>
+                                      </div>
+                                      {asignaturaDestino && (
+                                        <p className="text-sm text-primary-500 mb-2">
+                                          <span className="text-primary-300">→</span> {materia.asignatura_destino}
+                                        </p>
+                                      )}
+                                      <p className="text-xs text-primary-500 mb-3">
                                         {ectsOrigen} creditos{Number.isFinite(semestre) ? ` | Semestre ${semestre}` : ''}
                                       </p>
+
+                                      <div className="flex flex-wrap gap-2 mb-3">
+                                        {ectsOrigen > 0 && (
+                                          <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium bg-green-50 text-green-700 border border-green-200">
+                                            <CheckCircle className="w-3 h-3" />
+                                            {ectsOrigen} ECTS
+                                          </span>
+                                        )}
+                                        {tipoOrigen && tipoDestino && (
+                                          <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium bg-green-50 text-green-700 border border-green-200">
+                                            <CheckCircle className="w-3 h-3" />
+                                            {tipoOrigen} → {tipoDestino}
+                                          </span>
+                                        )}
+                                        {notaOrigen != null && (
+                                          <span className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium ${notaSuperada ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+                                            {notaSuperada ? <CheckCircle className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+                                            Nota: {notaOrigen}
+                                          </span>
+                                        )}
+                                      </div>
                                     </div>
-                                    <span className={`${styles.badge} text-xs font-bold px-2 py-1 rounded`}>
-                                      {scoreFinal > 0 ? `${scoreFinal}% Similitud` : '—'}
-                                    </span>
                                   </div>
 
                                   {(contenidosScore > 0 || resultadosScore > 0 || competenciasScore > 0) && (
-                                    <div className="mb-3 space-y-1">
-                                      {contenidosScore > 0 && renderScoreBar(contenidosScore, 'Cont')}
-                                      {resultadosScore > 0 && renderScoreBar(resultadosScore, 'Res')}
-                                      {competenciasScore > 0 && renderScoreBar(competenciasScore, 'Comp')}
+                                    <div className="mb-4 flex gap-2 justify-center">
+                                      {contenidosScore > 0 && (
+                                        <div className="bg-primary-50 rounded-lg p-2 text-center min-w-[60px]">
+                                          <div className={`text-lg font-bold ${getScoreColor(contenidosScore)}`}>{contenidosScore}</div>
+                                          <div className="text-[10px] text-primary-500">Contenidos</div>
+                                        </div>
+                                      )}
+                                      {resultadosScore > 0 && (
+                                        <div className="bg-primary-50 rounded-lg p-2 text-center min-w-[60px]">
+                                          <div className={`text-lg font-bold ${getScoreColor(resultadosScore)}`}>{resultadosScore}</div>
+                                          <div className="text-[10px] text-primary-500">Resultados</div>
+                                        </div>
+                                      )}
+                                      {competenciasScore > 0 && (
+                                        <div className="bg-primary-50 rounded-lg p-2 text-center min-w-[60px]">
+                                          <div className={`text-lg font-bold ${getScoreColor(competenciasScore)}`}>{competenciasScore}</div>
+                                          <div className="text-[10px] text-primary-500">Competencias</div>
+                                        </div>
+                                      )}
                                     </div>
                                   )}
 
-                                  <div className="flex flex-wrap gap-2 mb-3">
-                                    {ectsOk !== null && (
-                                      <span className={`text-xs px-2 py-0.5 rounded ${ectsOk ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                                        ECTS {ectsOk ? '✓' : '✗'}
-                                      </span>
-                                    )}
-                                    {tipoOk !== null && (
-                                      <span className={`text-xs px-2 py-0.5 rounded ${tipoOk ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                                        Tipo {tipoOk ? '✓' : '✗'}
-                                      </span>
-                                    )}
-                                    {notaOk !== null && (
-                                      <span className={`text-xs px-2 py-0.5 rounded ${notaOk ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                                        Nota {notaOk ? '✓' : '✗'}
-                                      </span>
-                                    )}
+                                  <div className="bg-gradient-to-br from-surface-50 to-primary-50/30 rounded-xl p-4 mb-3">
+                                    <div className="flex items-start gap-2 mb-2">
+                                      <Sparkles className="w-4 h-4 text-accent-500 mt-0.5 flex-shrink-0" />
+                                      <span className="text-xs font-semibold text-primary-700">Analisis IA</span>
+                                    </div>
+                                    <p className="text-sm text-primary-700 leading-relaxed">{analisis}</p>
                                   </div>
 
-<p className="text-sm text-primary-600 mb-3">
-                                    <span className="font-semibold text-primary-800">Analisis IA:</span> {analisis}
-                                  </p>
                                   {(citaOrigen || citaDestino) && (
-                                    <div className="text-xs text-primary-500 mb-3 space-y-1">
+                                    <div className="bg-white/60 rounded-lg p-3 mb-3 space-y-2">
                                       {citaOrigen && (
-                                        <div>
-                                          <span className="font-semibold text-primary-700">Origen:</span> “{citaOrigen}”
+                                        <div className="flex items-start gap-2">
+                                          <span className="text-[10px] font-bold text-primary-400 uppercase tracking-wide mt-1">Origen</span>
+                                          <p className="text-xs text-primary-600 italic leading-relaxed">&ldquo;{citaOrigen}&rdquo;</p>
                                         </div>
                                       )}
                                       {citaDestino && (
-                                        <div>
-                                          <span className="font-semibold text-primary-700">Destino:</span> “{citaDestino}”
+                                        <div className="flex items-start gap-2">
+                                          <span className="text-[10px] font-bold text-primary-400 uppercase tracking-wide mt-1">Destino</span>
+                                          <p className="text-xs text-primary-600 italic leading-relaxed">&ldquo;{citaDestino}&rdquo;</p>
                                         </div>
                                       )}
                                     </div>
                                   )}
+
                                   {advertencias.length > 0 && (
-                                    <div className="mb-3">
-                                      <div className="text-xs text-amber-600 font-semibold">Advertencias</div>
-                                      <ul className="text-xs text-amber-700">
+                                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-3">
+                                      <div className="flex items-center gap-2 mb-2">
+                                        <AlertTriangle className="w-4 h-4 text-amber-500" />
+                                        <span className="text-xs font-bold text-amber-700">Advertencias</span>
+                                      </div>
+                                      <ul className="text-xs text-amber-700 space-y-1">
                                         {advertencias.map((adv: string, advIndex: number) => (
-                                          <li key={`${adv}-${advIndex}`}>• {adv}</li>
+                                          <li key={`${adv}-${advIndex}`} className="flex items-start gap-1">
+                                            <span className="text-amber-400">•</span>
+                                            <span>{adv}</span>
+                                          </li>
                                         ))}
                                       </ul>
                                     </div>
                                   )}
-                                  <div className={`flex items-center text-xs ${styles.iconClass}`}>
-                                    <EstadoIcon className="w-3 h-3 mr-1" aria-hidden="true" />
-                                    <span className="sr-only">Estado: </span>{styles.label}
+
+                                  <div className={`flex items-center gap-2 text-xs font-medium ${styles.iconClass}`}>
+                                    <EstadoIcon className="w-4 h-4" aria-hidden="true" />
+                                    <span>Estado: {styles.label}</span>
                                   </div>
                                 </CardContent>
                               </Card>
@@ -1207,54 +1277,80 @@ export default function ConvalidacionPage() {
 {/* Sidebar Info */}
                     <div className="space-y-6">
                       {/* AI Analysis Info Card */}
-                      <Card className="bg-gradient-to-br from-primary-900 to-primary-800 border-primary-700 text-white">
-                        <CardContent className="p-6">
+<Card className="bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 border-primary-700 text-white relative overflow-hidden">
+                        <CardContent className="p-6 relative z-10">
                           <div className="flex items-center mb-6">
-                            <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center mr-3 backdrop-blur-sm">
+                            <div className="w-12 h-12 bg-gradient-to-br from-accent-400/20 to-accent-500/10 rounded-xl flex items-center justify-center mr-4 backdrop-blur-sm border border-accent-400/20">
                               <ShieldCheck className="w-6 h-6 text-accent-400" />
                             </div>
                             <div>
                               <h4 className="font-bold text-lg">Analisis IA</h4>
-                              <p className="text-xs text-primary-200">Reporte de Convalidacion</p>
+                              <p className="text-xs text-primary-300">Reporte de Convalidacion</p>
+                            </div>
+                            <div className="ml-auto">
+                              <div className="flex items-center gap-1 bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-medium">
+                                <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
+                                Verificado
+                              </div>
                             </div>
                           </div>
 
-                          <div className="space-y-4 text-sm">
-                            <div className="flex justify-between border-b border-white/10 pb-2">
-                              <span className="text-primary-300">Match ID:</span>
-                              <span className="font-mono text-accent-300 text-xs truncate max-w-[120px]" title={matchId}>{matchId.slice(0, 12)}...</span>
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between py-2 px-3 bg-white/5 rounded-lg">
+                              <div className="flex items-center gap-2">
+                                <span className="text-primary-400 text-xs">Match ID</span>
+                              </div>
+                              <span className="font-mono text-accent-300 text-xs">{matchId}</span>
                             </div>
-                            <div className="flex justify-between border-b border-white/10 pb-2">
-                              <span className="text-primary-300">Modelo:</span>
-                              <span className="text-white text-xs">{modelVersion}</span>
+                            <div className="flex items-center justify-between py-2 px-3 bg-white/5 rounded-lg">
+                              <div className="flex items-center gap-2">
+                                <span className="text-primary-400 text-xs">Modelo</span>
+                              </div>
+                              <span className="text-white text-xs font-medium bg-white/10 px-2 py-0.5 rounded">{modelVersion}</span>
                             </div>
-                            <div className="flex justify-between border-b border-white/10 pb-2">
-                              <span className="text-primary-300">Fecha:</span>
+                            <div className="flex items-center justify-between py-2 px-3 bg-white/5 rounded-lg">
+                              <div className="flex items-center gap-2">
+                                <span className="text-primary-400 text-xs">Fecha</span>
+                              </div>
                               <span className="text-white text-xs">{analysisTimestamp}</span>
                             </div>
-                            <div className="flex justify-between">
-                              <span className="text-primary-300">Estado:</span>
-                              <span className="flex items-center text-green-400 text-xs font-bold">
-                                <CheckCircle className="w-3 h-3 mr-1" /> Completado
+                            <div className="flex items-center justify-between py-2 px-3 bg-white/5 rounded-lg">
+                              <div className="flex items-center gap-2">
+                                <span className="text-primary-400 text-xs">Estado</span>
+                              </div>
+                              <span className="flex items-center gap-1.5 text-green-400 text-xs font-bold">
+                                <CheckCircle className="w-4 h-4" /> Completado
                               </span>
                             </div>
-                            {convalidacionResult?.blockchain && (
-                              <div className="pt-2 border-t border-white/10">
-                                <span className="text-primary-300 text-xs">Blockchain:</span>
-                                <a
-                                  href={convalidacionResult.blockchain.explorer_url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="flex items-center text-accent-400 hover:text-accent-300 text-xs mt-1 truncate"
-                                  title={convalidacionResult.blockchain.tx_hash}
-                                >
-                                  <span className="mr-1">↗</span>
-                                  {convalidacionResult.blockchain.tx_hash.slice(0, 10)}...
-                                </a>
-                              </div>
-                            )}
                           </div>
+
+                          {convalidacionResult?.blockchain && (
+                            <div className="mt-4 pt-4 border-t border-white/10">
+                              <div className="flex items-center gap-2 mb-3">
+                                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                                <span className="text-green-400 text-xs font-medium">Registro Blockchain</span>
+                              </div>
+                              <a
+                                href={convalidacionResult.blockchain.explorer_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center justify-between bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg p-3 transition-all group"
+                              >
+                                <div>
+                                  <span className="text-primary-400 text-xs">Transaccion</span>
+                                  <div className="font-mono text-accent-300 text-sm mt-1">{convalidacionResult.blockchain.tx_hash.slice(0, 18)}...</div>
+                                </div>
+                                <div className="flex items-center gap-1 text-accent-400 group-hover:text-accent-300">
+                                  <span className="text-xs">Verificar</span>
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                  </svg>
+                                </div>
+                              </a>
+                            </div>
+                          )}
                         </CardContent>
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-accent-500/10 rounded-full blur-2xl"></div>
                       </Card>
 
                       {/* Risk Indicator Card */}
